@@ -27,7 +27,7 @@ public class PostService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NotFoundException("User not found. id=" + request.getUserId()));
 
-        Post post = new Post(request.getTitle(), request.getContent(), user);
+        Post post = new Post(user, request.getTitle(), request.getContent());
         Post savedPost = postRepository.save(post);
 
         return PostResponse.from(savedPost);
