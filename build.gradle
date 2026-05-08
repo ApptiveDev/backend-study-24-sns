@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.5.14'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.boot' version '3.2.4'
+	id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'com.example'
@@ -17,15 +17,24 @@ repositories {
 	mavenCentral()
 }
 
+// 문제의 원인이었던 박스! 도구들은 반드시 이 안에 있어야 합니다.
 dependencies {
+	// 1. 기본 웹 서버 도구
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// 2. 데이터베이스 & JPA & JDBC 관련 도구 (과제 필수 사항)
+	runtimeOnly 'com.h2database:h2'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+
+	// 3. 편의 도구 (Lombok 등)
 	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// 4. 테스트 도구
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testCompileOnly 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
