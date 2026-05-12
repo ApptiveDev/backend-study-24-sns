@@ -27,6 +27,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2' // H2 Database 사용
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA 사용
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc' // JDBC 사용
 }
 
 tasks.named('test') {
