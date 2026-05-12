@@ -1,3 +1,20 @@
 spring:
   application:
     name: sns
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:snsdb # 원하는 이름
+    username: username
+    password: password
+
+  h2:
+    console:
+      enabled: true # true로 설정 시 console로 DB가 잘 만들어졌는지 확인 가능함
+      path: /h2-console # localhost:8080 뒤에 붙는 URI
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.H2Dialect # JPA가 H2 중심으로 SQL 구문 해석
+    show-sql: true # JPA가 생성하는 SQL문을 로그로 보고 싶을 때 true
