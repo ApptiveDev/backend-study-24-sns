@@ -1,13 +1,20 @@
-package com.example.sns.domain;
+package com.example.sns.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 // 중복되는 어노테이션 설명은 User에 있음
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "posts")
 public class Post {
 
@@ -23,6 +30,13 @@ public class Post {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @CreatedDate // 생성 시 자동 저장
+    @Column(updatable = false) // 생성 시간은 수정 불가능하게 설정
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate // 수정 시 자동 저장
+    private LocalDateTime updatedAt;
+
     // 양방향 N:1 관계 매핑 어노테이션 (여러 게시글을 사용자 한 명이 가짐)
     @ManyToOne(fetch = FetchType.LAZY)
     // DB테이블에서 외래키(FK)의 이름을 user_id로 지정하는 어노테이션
@@ -36,9 +50,18 @@ public class Post {
         this.user = user;
     }
 
-    // 수정 기능을 위한 메서드
-    public void update(String title, String content) {
-        this.title = title;
-        this.content = content;
+    // 수정 기능을 위한 함수
+    // 제목만 수정
+    public void updateTitle(String title) {
+        if (title != null && !title.isBlank()) {
+            this.title = title;
+        }
+    }
+
+    // 내용만 수정
+    public void updateContent(String content) {
+        if (content != null && !content.isBlank()) {
+            this.content = content;
+        }
     }
 }
