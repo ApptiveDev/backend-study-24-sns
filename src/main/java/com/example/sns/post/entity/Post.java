@@ -4,22 +4,24 @@ import com.example.sns.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String title;
 
-    @Column
+    @Column(nullable = false)
     private String content;
 
     @Column
@@ -44,12 +46,5 @@ public class Post {
         this.content = content;
         this.updatedAt = LocalDateTime.now(); // 자동으로 함께 업데이트
     }
-
-//    private Long id;
-//    private Long userId;
-//    private String title;
-//    private String content;
-//    private LocalDateTime createdAt;
-//    private LocalDateTime updatedAt;
 
 }

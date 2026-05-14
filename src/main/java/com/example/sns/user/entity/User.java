@@ -26,13 +26,4 @@ public class User {
         this.password = password;
     }
 
-
-    // 이메일, 패스워드 검증 메서드
-
-//    private String id;
-//    private String name;
-//    private String email;
-//    private String password;
-//    private LocalDateTime createdAt;
-
 }
