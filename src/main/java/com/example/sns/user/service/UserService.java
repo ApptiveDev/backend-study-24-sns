@@ -1,5 +1,6 @@
 package com.example.sns.user.service;
 
+import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.user.dto.UserResponse;
 import com.example.sns.user.entity.User;
 import com.example.sns.user.repository.UserRepository;
@@ -24,7 +25,7 @@ public class UserService {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
-        User user = new User(request.email(), request.password());
+        User user = new User(request.email(), request.name(), request.password());
         userRepository.save(user);
 
         return UserResponse.from(user);
@@ -33,7 +34,7 @@ public class UserService {
     // 개별 조회
     public UserResponse findById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("사용자 정보가 없습니다.")
+                () -> new UserNotFoundException(userId)
         );
 
         return UserResponse.from(user);

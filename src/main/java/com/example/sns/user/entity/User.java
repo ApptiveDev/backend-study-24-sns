@@ -1,6 +1,7 @@
 package com.example.sns.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "users")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
@@ -19,10 +20,14 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private String password;
 
-    public User(String email, String password) {
+    public User(String email, String name, String password) {
         this.email = email;
+        this.name = name;
         this.password = password;
     }
 
