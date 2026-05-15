@@ -49,7 +49,7 @@ public class PostService {
     }
 
     public List<PostResponse> findAllPost() {
-        List<Post> posts = postRepository.findAllWithUser();
+        List<Post> posts = postRepository.findAllWithAuthor();
         List<PostResponse> postResponses = new ArrayList<>();
         for (Post post : posts) {
             postResponses.add(PostResponse.from(post));

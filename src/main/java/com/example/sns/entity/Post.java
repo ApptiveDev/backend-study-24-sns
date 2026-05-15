@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,11 +23,19 @@ public class Post {
     @JoinColumn(name = "author_id")
     private User author;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
 
     private Post(User author, String title, String content) {
         this.author = author;
@@ -57,6 +68,42 @@ public class Post {
 
         this.title = title;
         this.content = content;
+    }
+
+    public Comment addComment(String content, User commenter) {
+        Comment comment = Comment.create(content, this, commenter);
+        this.comments.add(comment);
+        return comment;
+    }
+
+    public void editComment(Long commentId, String newContent, User requester) {
+        Comment comment = findComment(commentId);
+        comment.edit(newContent, requester);
+    }
+
+    public void removeComment(Long commentId, User requester) {
+        Comment comment = findComment(commentId);
+
+        if (!comment.isWrittenBy(requester) && !this.isWrittenBy(requester)) {
+            throw new IllegalArgumentException("댓글 삭제 권한이 없습니다.");
+        }
+
+        this.comments.remove(comment);
+    }
+
+    public List<Comment> getComments() {
+        return Collections.unmodifiableList(comments);
+    }
+
+    private Comment findComment(Long commentId) {
+        return this.comments.stream()
+                .filter(comment -> comment.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글에 존재하지 않는 댓글입니다."));
+    }
+
+    public boolean isWrittenBy(User user) {
+        return this.author.isSameUser(user);
     }
 
 }
