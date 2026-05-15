@@ -8,11 +8,12 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @Table(name = "posts")
-
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
 
     @Column(columnDefinition = "TEXT")
@@ -28,11 +29,10 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    protected Post(){
-
+    protected Post() {
     }
 
-    public Post(String title, String content, User user) {
+    private Post(String title, String content, User user) {
         this.title = title;
         this.content = content;
         this.user = user;
@@ -40,10 +40,17 @@ public class Post {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public static Post create(String title, String content, User user) {
+        return new Post(title, content, user);
+    }
+
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
-        this.updatedAt = LocalDateTime.now();
     }
 
+    @PreUpdate
+    private void updateUpdatedAt() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
