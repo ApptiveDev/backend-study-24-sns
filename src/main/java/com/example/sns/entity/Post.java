@@ -1,21 +1,26 @@
 package com.example.sns.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Table(name = "posts")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "author_id")
+    private User author;
+
+    private String title;
 
     private String content;
 
@@ -23,14 +28,37 @@ public class Post {
 
     private LocalDateTime createdAt;
 
-    public Post(User user, String content) {
-        this.user = user;
+    private Post(User author, String title, String content) {
+        this.author = author;
+        this.title = title;
         this.content = content;
         this.likeCount = 0;
         this.createdAt = LocalDateTime.now();
     }
 
-    public void update(String content) {
+    public static Post create(User author, String title, String content) {
+        if (author == null) {
+            throw new IllegalArgumentException("작성자는 필수입니다.");
+        }
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("제목은 필수입니다.");
+        }
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("내용은 필수입니다.");
+        }
+        return new Post(author, title, content);
+    }
+
+    public void update(String title, String content) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("제목은 필수입니다.");
+        }
+
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("내용은 필수입니다.");
+        }
+
+        this.title = title;
         this.content = content;
     }
 

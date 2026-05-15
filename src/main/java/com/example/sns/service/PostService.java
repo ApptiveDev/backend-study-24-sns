@@ -5,9 +5,11 @@ import com.example.sns.dto.PostResponse;
 import com.example.sns.dto.PostUpdateRequest;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
+import com.example.sns.exception.PostNotFoundException;
+import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,7 @@ public class PostService {
     @Transactional
     public Long createPost(PostCreateRequest request) {
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(UserNotFoundException::new);
 
         Post post = new Post(user, request.content());
 
@@ -33,24 +35,21 @@ public class PostService {
 
     @Transactional
     public void update(Long postId, PostUpdateRequest request) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
 
         post.update(request.content());
     }
 
     @Transactional
     public void delete(Long postId) {
-        postRepository.deleteById(postId);
-    }
-
-    public PostResponse findOnePost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
-        return PostResponse.from(post);
+                        .orElseThrow(PostNotFoundException::new);
+        postRepository.delete(post);
     }
 
     public List<PostResponse> findAllPost() {
-        List<Post> posts = postRepository.findAll();
+        List<Post> posts = postRepository.findAllWithUser();
         List<PostResponse> postResponses = new ArrayList<>();
         for (Post post : posts) {
             postResponses.add(PostResponse.from(post));
