@@ -24,15 +24,12 @@ public class Post {
 
     private String content;
 
-    private int likeCount;
-
     private LocalDateTime createdAt;
 
     private Post(User author, String title, String content) {
         this.author = author;
         this.title = title;
         this.content = content;
-        this.likeCount = 0;
         this.createdAt = LocalDateTime.now();
     }
 

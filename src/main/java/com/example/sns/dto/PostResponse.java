@@ -7,17 +7,17 @@ import java.time.LocalDateTime;
 
 public record PostResponse(
         Long id,
-        Long userId,
+        Long authorId,
+        String title,
         String content,
-        int likeCount,
         LocalDateTime createdAt
 ) {
     public static PostResponse from(Post post) {
         return new PostResponse(
                 post.getId(),
-                post.getUser().getId(),
+                post.getAuthor().getId(),
+                post.getTitle(),
                 post.getContent(),
-                post.getLikeCount(),
                 post.getCreatedAt()
         );
     }

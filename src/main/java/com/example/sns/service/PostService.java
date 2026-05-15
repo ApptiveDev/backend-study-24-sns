@@ -25,10 +25,10 @@ public class PostService {
 
     @Transactional
     public Long createPost(PostCreateRequest request) {
-        User user = userRepository.findById(request.userId())
+        User author = userRepository.findById(request.authorId())
                 .orElseThrow(UserNotFoundException::new);
 
-        Post post = new Post(user, request.content());
+        Post post = Post.create(author, request.title(), request.content());
 
         return postRepository.save(post).getId();
     }
@@ -38,7 +38,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
 
-        post.update(request.content());
+        post.update(request.title(), request.content());
     }
 
     @Transactional
