@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class PostService {
 
     private final PostRepository postRepository;
@@ -29,7 +30,7 @@ public class PostService {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Post post = new Post(
+        Post post = Post.create(
                 request.title(),
                 request.content(),
                 user
@@ -41,7 +42,6 @@ public class PostService {
     }
 
     // 게시글 전체 조회
-    @Transactional(readOnly = true)
     public List<PostResponse> getPosts() {
         return postRepository.findAll()
                 .stream()
@@ -50,7 +50,6 @@ public class PostService {
     }
 
     // 게시글 조회
-    @Transactional(readOnly = true)
     public PostResponse getPost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
