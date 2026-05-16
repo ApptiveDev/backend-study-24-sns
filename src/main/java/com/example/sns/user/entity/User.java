@@ -31,4 +31,8 @@ public class User {
         this.password = password;
     }
 
+    // 추후에 도메인 규칙 추가
+    public static User create(String email, String name, String password) {
+        return new User(email, name, password);
+    }
 }

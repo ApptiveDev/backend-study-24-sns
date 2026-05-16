@@ -1,5 +1,6 @@
 package com.example.sns.user.service;
 
+import com.example.sns.exception.DuplicateEmailException;
 import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.user.dto.UserResponse;
 import com.example.sns.user.entity.User;
@@ -22,10 +23,11 @@ public class UserService {
     public UserResponse createUser(SignupRequest request) {
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new DuplicateEmailException(request.email());
         }
 
-        User user = new User(request.email(), request.name(), request.password());
+        User user = User.create(request.email(), request.name(), request.password());
+
         userRepository.save(user);
 
         return UserResponse.from(user);

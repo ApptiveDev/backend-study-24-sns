@@ -1,6 +1,13 @@
 package com.example.sns.exception;
 
+import java.time.LocalDateTime;
+
 public record ErrorResponse(
-        String message  // 에러 메시지
+        int status,
+        String message,
+        LocalDateTime timestamp
 ) {
+    public static ErrorResponse of(int status, String message) {
+        return new ErrorResponse(status, message, LocalDateTime.now());
+    }
 }
