@@ -10,6 +10,7 @@ import com.example.sns.post.dto.PostResponse;
 import com.example.sns.post.repository.PostRepository;
 import com.example.sns.post.dto.PostUpdateRequest;
 import com.example.sns.post.entity.Post;
+import com.example.sns.postlike.PostLikeRepository;
 import com.example.sns.user.entity.User;
 import com.example.sns.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final PostLikeRepository postLikeRepository;
 
     @Transactional
     public PostResponse create(PostCreateRequest request) {
@@ -56,8 +58,9 @@ public class PostService {
                     .orElseThrow(() -> new PostNotFoundException(postId));
 
             List<Comment> comments = commentRepository.findByPostIdWithUser(post.getId());
+            long likeCount = postLikeRepository.countByPostId(postId);
 
-            return PostDetailResponse.from(post, comments);
+            return PostDetailResponse.from(post, comments, likeCount);
     }
 
     // 수정
