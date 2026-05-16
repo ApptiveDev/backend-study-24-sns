@@ -1,0 +1,14 @@
+package com.example.sns.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+// 게시글을 작성해서 보낼 때 데이터를 받는 용도로 사용
+public record PostCreateRequestDto(
+        @NotBlank(message = "제목은 필수입니다.")
+        String title,
+        @NotBlank(message = "내용은 필수입니다.")
+        String content,
+        @NotNull
+        Long userId // 어느 유저가 쓰는지 ID값만 받음
+) {}

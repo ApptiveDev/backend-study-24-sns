@@ -1,8 +1,10 @@
-package com.example.sns.domain;
+package com.example.sns.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +12,8 @@ import java.util.List;
 @Entity
 // Getter method를 자동 생성하는 어노테이션
 @Getter
-// 인자 없는 default constructor 자동 생성하는 어노테이션 (public User(){} 와 같은 역할)
-@NoArgsConstructor
+// 인자 없는 default constructor 자동 생성하는 어노테이션 (protected User(){} 와 같은 역할)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 // DB테이블의 이름을 정하는 어노테이션 (여기선 users로 설정)
 @Table(name = "users")
 public class User {
@@ -33,14 +35,18 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
+    private String password;
+
     // 양방향 1:N 관계 매핑 어노테이션
     // (사용자 한 명이 여러 게시글을 가짐, 주인이 아닌 쪽이므로 mappedBy로 주인 지정)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
 
     // 테스트 및 데이터 생성을 위한 생성자
-    public User(String username, String email) {
+    public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
+        this.password = password;
     }
 }
