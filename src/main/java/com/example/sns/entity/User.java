@@ -1,17 +1,17 @@
 package com.example.sns.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "users") // User는 DB 예약어일 수 있어서 보통 users로 많이 씁니다.
-@Getter @Setter
-@NoArgsConstructor
+@Table(name = "users")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 외부에서 무분별한 생성을 막습니다.
 public class User {
 
     @Id
@@ -21,7 +21,12 @@ public class User {
     private String name;
     private String email;
 
-    // 한 명의 유저가 여러 개의 게시글을 가질 수 있도록 리스트(List)로 연결해 줍니다.
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
+
+    // 생성자를 통해 안전하게 객체 생성
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }
