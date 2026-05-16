@@ -35,7 +35,6 @@ public class PostService {
     }
 
     public List<PostResponse> getPosts() {
-        // N+1 문제 해결된 메서드 호출
         return postRepository.findAllWithUser().stream()
                 .map(PostResponse::from)
                 .collect(Collectors.toList());
