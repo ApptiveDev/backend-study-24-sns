@@ -1,11 +1,14 @@
 package com.example.sns.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "users")
 public class User {
@@ -20,9 +23,6 @@ public class User {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    protected User() {
-    }
 
     private User(String email, String nickname) {
         this.email = email;
