@@ -2,6 +2,8 @@ package com.example.sns.post.service;
 
 import com.example.sns.comment.entity.Comment;
 import com.example.sns.comment.repository.CommentRepository;
+import com.example.sns.exception.BusinessException;
+import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.PostNotFoundException;
 import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.post.dto.PostCreateRequest;
@@ -37,7 +39,7 @@ public class PostService {
     @Transactional
     public PostResponse create(PostCreateRequest request) {
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new UserNotFoundException(request.userId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Post post = new Post(request.title(), request.content(), user);
         postRepository.save(post);
@@ -54,8 +56,7 @@ public class PostService {
 
     // Id별 조회
     public PostDetailResponse findByIdWithComments(Long postId) {
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new PostNotFoundException(postId));
+            Post post = findById(postId);
 
             List<Comment> comments = commentRepository.findByPostIdWithUser(post.getId());
             long likeCount = postLikeRepository.countByPostId(postId);
@@ -66,8 +67,7 @@ public class PostService {
     // 수정
     @Transactional
     public PostResponse update(Long postId, PostUpdateRequest request) {
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new PostNotFoundException(postId));
+        Post post = findById(postId);
 
         post.update(request.title(), request.content());
 
@@ -82,4 +82,8 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 
+    public Post findById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+    }
 }

@@ -5,9 +5,7 @@ import com.example.sns.comment.dto.CommentResponse;
 import com.example.sns.comment.dto.CommentUpdateRequest;
 import com.example.sns.comment.entity.Comment;
 import com.example.sns.comment.repository.CommentRepository;
-import com.example.sns.exception.CommentNotFoundException;
-import com.example.sns.exception.PostNotFoundException;
-import com.example.sns.exception.UserNotFoundException;
+import com.example.sns.exception.*;
 import com.example.sns.post.entity.Post;
 import com.example.sns.post.repository.PostRepository;
 import com.example.sns.user.entity.User;
@@ -31,10 +29,10 @@ public class CommentService {
     @Transactional
     public CommentResponse create(Long postId, CommentCreateRequest request) {
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new UserNotFoundException(request.userId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
         Comment comment = new Comment(request.content(), user, post);
         commentRepository.save(comment);
@@ -46,7 +44,7 @@ public class CommentService {
     // 댓글 조회
     public List<CommentResponse> findByPostId(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
         return commentRepository.findAllWithUser()
                 .stream()
@@ -60,7 +58,7 @@ public class CommentService {
     public CommentResponse update(Long commentId, CommentUpdateRequest request) {
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException(commentId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
 
         comment.update(request.content());
 

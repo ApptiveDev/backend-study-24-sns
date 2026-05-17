@@ -1,6 +1,8 @@
 package com.example.sns.user.service;
 
+import com.example.sns.exception.BusinessException;
 import com.example.sns.exception.DuplicateEmailException;
+import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.user.dto.UserResponse;
 import com.example.sns.user.entity.User;
@@ -23,7 +25,7 @@ public class UserService {
     public UserResponse createUser(SignupRequest request) {
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new DuplicateEmailException(request.email());
+            throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         User user = User.create(request.email(), request.name(), request.password());
@@ -36,7 +38,7 @@ public class UserService {
     // 개별 조회
     public UserResponse findById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(userId)
+                () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
         );
 
         return UserResponse.from(user);
