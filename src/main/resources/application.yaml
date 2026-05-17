@@ -14,7 +14,6 @@ spring:
       path: /h2-console
 
   jpa:
-    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create
     database-platform: org.hibernate.dialect.H2Dialect
