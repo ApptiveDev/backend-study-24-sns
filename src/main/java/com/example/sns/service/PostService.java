@@ -15,13 +15,14 @@ import java.util.List; // List 타입 사용
 
 // 이 클래스가 Service임을 선언하는 어노테이션
 @Service
-@Transactional // 데이터 변경 시 필요
+@Transactional(readOnly = true) // 기본적으로 읽기 전용으로 설정 (성능 최적화)
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
     // 작성
+    @Transactional // 저장할 때는 쓰기 권한이 필요함
     public void createPost(PostCreateRequestDto dto) {
         // 숫자로 된 ID를 가지고 DB에서 진짜 User 객체를 찾아옴.
         User user = userRepository.findById(dto.userId())
@@ -32,7 +33,6 @@ public class PostService {
     }
 
     // 전체 조회
-    @Transactional(readOnly = true) // 수정 불가 오버라이드
     public List<PostResponseDto> getAllPosts() {
         List<Post> posts = postRepository.findAll();
         return posts.stream()
@@ -41,6 +41,7 @@ public class PostService {
     }
 
     // 3. 수정
+    @Transactional
     public void updatePost(Long id, PostUpdateRequestDto dto) {
         // DB에서 수정할 글을 먼저 찾아옴.
         Post post = postRepository.findById(id)
@@ -56,6 +57,7 @@ public class PostService {
         }
     }
 
+    @Transactional
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
