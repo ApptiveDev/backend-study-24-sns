@@ -10,6 +10,7 @@ import com.example.sns.exception.PostNotFoundException;
 import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,15 @@ import org.springframework.stereotype.Service;
 public class CommentCommandService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final EntityManager entityManager;
 
     public CommentResponse addComment(Long postId, CommentCreateRequest request) {
         Post post = findPostWithDetails(postId);
         User commenter = findUser(request.commenterId());
 
         Comment comment = post.addComment(request.content(), commenter);
+
+        entityManager.flush();
 
         return CommentResponse.from(comment);
     }
