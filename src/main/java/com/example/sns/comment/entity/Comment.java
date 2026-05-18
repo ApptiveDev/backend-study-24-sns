@@ -45,8 +45,21 @@ public class Comment {
         this.createdAt = LocalDateTime.now();
     }
 
+    public static Comment createComment(String content, User user, Post post) {
+        validateContent(content);
+
+        return new Comment(content, user, post);
+    }
+
     public void update(String content) {
         this.content = content;
         this.updatedAt = LocalDateTime.now();
+    }
+
+
+    private static void validateContent(String content) {
+        if (content == null || content.isEmpty()) {
+            throw new IllegalArgumentException("내용은 필수입니다.");
+        }
     }
 }

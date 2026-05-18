@@ -34,7 +34,7 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
-        Comment comment = new Comment(request.content(), user, post);
+        Comment comment = Comment.createComment(request.content(), user, post);
         commentRepository.save(comment);
 
         return CommentResponse.from(comment);

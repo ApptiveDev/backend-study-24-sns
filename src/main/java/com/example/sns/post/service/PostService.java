@@ -41,7 +41,7 @@ public class PostService {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        Post post = new Post(request.title(), request.content(), user);
+        Post post = Post.createPost(request.title(), request.content(), user);
         postRepository.save(post);
 
         return PostResponse.from(post);
