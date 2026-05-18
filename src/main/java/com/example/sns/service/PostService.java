@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.sns.dto.PostRequestDto;
 import com.example.sns.dto.PostResponseDto;
 import com.example.sns.entity.Post;
+import com.example.sns.exception.PostNotFoundException;
 import com.example.sns.repository.PostRepository;
 
 import java.util.List;
@@ -36,13 +37,13 @@ public class PostService {
 
     public PostResponseDto getPostById(Long id){
         Post post = postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("잘못된 번호 입니다."));
+            .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
         return new PostResponseDto(post);
     }
     @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto requestDto){
         Post post = postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("잘못된 번호입니다."));
+            .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
 
         post.updatePost(requestDto.title(), requestDto.content());
 
@@ -52,7 +53,7 @@ public class PostService {
     @Transactional
     public void deletePost(Long id){
         Post post = postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("삭제할 게시물이 없습니다."));
+            .orElseThrow(() -> new PostNotFoundException("삭제할 게시글을 찾을 수 없습니다."));;
 
         postRepository.delete(post);
     }

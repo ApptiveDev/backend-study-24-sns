@@ -11,6 +11,8 @@ import com.example.sns.dto.LikesResponseDto;
 import com.example.sns.entity.Likes;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
+import com.example.sns.exception.PostNotFoundException;
+import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.repository.LikesRepository;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
@@ -32,10 +34,10 @@ public class LikesService {
     @Transactional
     public LikesResponseDto toggleLike(Long postId, LikesRequestDto requestDto){
         Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new IllegalArgumentException("유효한 게시물이 아닙니다."));
+            .orElseThrow(() -> new PostNotFoundException("좋아요를 누를 게시글을 찾을 수 없습니다."));
 
         User user = userRepository.findById(requestDto.userId())
-            .orElseThrow(() -> new IllegalArgumentException("유효한 사용자가 아닙니다."));
+            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
 
         Optional<Likes> existingLike = likesRepository.findByPostIdAndUserId(postId, requestDto.userId());
 
