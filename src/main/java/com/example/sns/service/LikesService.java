@@ -27,10 +27,10 @@ public class LikesService {
         Post post = postRepository.findById(postId)
             .orElseThrow(() -> new IllegalArgumentException("유효한 게시물이 아닙니다."));
 
-        User user = userRepository.findById(requestDto.getUserId())
+        User user = userRepository.findById(requestDto.userId())
             .orElseThrow(() -> new IllegalArgumentException("유효한 사용자가 아닙니다."));
 
-        Likes existingLike = likesRepository.findByPostIdAndUserId(postId, requestDto.getUserId());
+        Likes existingLike = likesRepository.findByPostIdAndUserId(postId, requestDto.userId());
 
         if(existingLike != null){
             likesRepository.delete(existingLike);

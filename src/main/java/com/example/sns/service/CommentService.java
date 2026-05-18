@@ -27,7 +27,7 @@ public class CommentService {
             .orElseThrow(() -> new IllegalArgumentException("잘못된 게시물입니다."));
         
         Comment comment = new Comment();
-        comment.setContent(requestDto.getContent());
+        comment.setContent(requestDto.content());
         comment.setPost(post);
 
         Comment savedComment = commentRepository.save(comment);
@@ -44,7 +44,7 @@ public class CommentService {
         Comment existingComment = commentRepository.findById(commentId)
             .orElseThrow(() -> new IllegalArgumentException("잘못된 댓글입니다."));
 
-        existingComment.setContent(requestDto.getContent());
+        existingComment.setContent(requestDto.content());
 
         Comment updatedComment = commentRepository.save(existingComment);
         return new CommentResponseDto(updatedComment);
