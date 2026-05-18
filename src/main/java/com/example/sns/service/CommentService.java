@@ -31,7 +31,7 @@ public class CommentService {
         comment.setPost(post);
 
         Comment savedComment = commentRepository.save(comment);
-        return new CommentResponseDto(savedComment);
+        return new CommentResponseDto(savedComment);    
     }
 
     public List<CommentResponseDto> getCommentByPost(Long postId){

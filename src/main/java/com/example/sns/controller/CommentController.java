@@ -13,17 +13,16 @@ import com.example.sns.dto.CommentRequestDto;
 import com.example.sns.dto.CommentResponseDto;
 import com.example.sns.service.CommentService;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/posts/{postId}/comments")
+@RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
-
-    public CommentController(CommentService commentService){
-        this.commentService = commentService;
-    }
-
+    
     @PostMapping
     public CommentResponseDto createComment(@PathVariable("postId") Long postId, @RequestBody CommentRequestDto requestDto){
         return commentService.createComment(postId, requestDto);

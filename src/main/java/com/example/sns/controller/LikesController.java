@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.sns.service.LikesService;
 
+import lombok.RequiredArgsConstructor;
+
 import com.example.sns.dto.LikesRequestDto;
 import com.example.sns.dto.LikesResponseDto;
 
 
 @RestController
 @RequestMapping("/posts/{postId}/likes")
+@RequiredArgsConstructor
 public class LikesController {
     private final LikesService likesService;
-    public LikesController(LikesService likesService) {
-        this.likesService = likesService;
-    }
 
     @PostMapping
     public LikesResponseDto toggleLike(@PathVariable("postId") Long postId, @RequestBody LikesRequestDto requestDto){

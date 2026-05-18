@@ -4,16 +4,16 @@ import org.springframework.web.bind.annotation.*;
 import com.example.sns.dto.PostRequestDto;
 import com.example.sns.dto.PostResponseDto;
 import com.example.sns.service.PostService;
+
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
+@RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-
-    public PostController(PostService postRepository) {
-        this.postService = postRepository;
-    }
 
     @PostMapping
     public PostResponseDto createPost(@RequestBody PostRequestDto requestDto){
