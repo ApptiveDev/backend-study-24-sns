@@ -65,20 +65,4 @@ public class PostController {
         postService.delete(postId);
         return ResponseEntity.noContent().build();
     }
-
-
-    // 댓글 생성
-    @PostMapping("/{postId}/comments")
-    public ResponseEntity<CommentResponse> create(@Valid @PathVariable Long postId, @Valid @RequestBody CommentCreateRequest request) {
-        CommentResponse response = commentService.create(postId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-
-    // 댓글 조회
-    @GetMapping("/{postId}/comments")
-    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Long postId) {
-        List<CommentResponse> responses = commentService.findByPostId(postId);
-        return ResponseEntity.ok(responses);
-    }
 }

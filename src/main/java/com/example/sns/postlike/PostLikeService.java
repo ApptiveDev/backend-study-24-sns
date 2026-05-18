@@ -1,5 +1,7 @@
 package com.example.sns.postlike;
 
+import com.example.sns.exception.BusinessException;
+import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.PostNotFoundException;
 import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.post.entity.Post;
@@ -28,11 +30,11 @@ public class PostLikeService {
         } else {
 
             User user = userRepository.findById(userId).orElseThrow(
-                    () -> new UserNotFoundException(userId)
+                    () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
             );
 
             Post post = postRepository.findById(postId).orElseThrow(
-                    () -> new PostNotFoundException(postId));
+                    () -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
             PostLike postLike = new PostLike(user, post);
 
