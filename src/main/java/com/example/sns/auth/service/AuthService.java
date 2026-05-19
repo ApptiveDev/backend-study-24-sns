@@ -25,11 +25,11 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_PASSWORD));
 
         if(!user.getPassword().equals(request.password())) {
             // 예외 처리
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 틀렸습니다.");
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
 
         String accessToken = jwtUtil.generateAccessToken(user.getId());
@@ -41,18 +41,19 @@ public class AuthService {
         return LoginResponse.of(accessToken, refreshToken, user.getId());
     }
 
-    // 검증을 RefreshToken 엔티티에서 하기
+
     public TokenResponse refresh(String refreshToken) {
 
         // 1. Refresh Token 검증
         if (!jwtUtil.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
+            throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
 
         // 2. DB에서 확인
         RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(() -> new IllegalArgumentException("Refresh Token을 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
+
 
         // 3. 새 Access Token 발급
         String newAccessToken = jwtUtil.generateAccessToken(token.getId());

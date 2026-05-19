@@ -1,5 +1,7 @@
 package com.example.sns.security.interceptor;
 
+import com.example.sns.exception.BusinessException;
+import com.example.sns.exception.ErrorCode;
 import com.example.sns.security.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,9 +26,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         String token = request.getHeader("Authorization");
 
         if (token == null || !token.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("토큰이 없습니다.");
-            return false;
+            throw new BusinessException(ErrorCode.TOKEN_MISSING);
         }
 
         //  "Bearer " + 제거
@@ -35,9 +35,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         // 2. 토큰 검증
         if (!jwtUtil.validateToken(token)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("유효하지 않은 토큰입니다.");
-            return false;
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
 
