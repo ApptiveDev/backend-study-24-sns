@@ -13,7 +13,7 @@ public record ErrorResponse(
                 errorCode.name(),
                 errorCode.getStatus().value(),
                 customMessage,
-                LocalDateTime.now()
+                 LocalDateTime.now()
         );
     }
 }
