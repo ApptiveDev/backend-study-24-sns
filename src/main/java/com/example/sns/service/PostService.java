@@ -57,13 +57,8 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException(id));
 
         // 엔티티의 데이터를 바꿈. (Transactional 덕분에 자동으로 DB에 반영됨)
-        // 값이 들어온 경우에만 각각의 수정 함수를 호출 (PATCH의 핵심)
-        if (dto.title() != null) {
-            post.updateTitle(dto.title());
-        }
-        if (dto.content() != null) {
-            post.updateContent(dto.content());
-        }
+        // 엔티티가 값 검증하고 업데이트함.
+        post.update(dto.title(), dto.content());
     }
 
     @Transactional

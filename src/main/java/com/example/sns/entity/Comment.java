@@ -48,7 +48,8 @@ public class Comment {
         this.post = post;
     }
 
-    public void updateContent(String content) {
+    // 값 검증 및 수정
+    public void update(String content) {
         if (content != null && !content.isBlank()) {
             this.content = content;
         }

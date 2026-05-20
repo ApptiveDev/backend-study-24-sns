@@ -50,18 +50,22 @@ public class Post {
         this.user = user;
     }
 
-    // 수정 기능을 위한 함수
+    // 값 검증 및 수정 기능을 위한 함수
     // 제목만 수정
     public void updateTitle(String title) {
         if (title != null && !title.isBlank()) {
             this.title = title;
         }
     }
-
     // 내용만 수정
     public void updateContent(String content) {
         if (content != null && !content.isBlank()) {
             this.content = content;
         }
+    }
+    // update 메소드
+    public void update(String title, String content) {
+        updateTitle(title);
+        updateContent(content);
     }
 }

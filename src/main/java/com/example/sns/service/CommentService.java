@@ -61,8 +61,8 @@ public class CommentService {
     public void updateComment(Long commentId, CommentUpdateRequestDto dto) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
-        // @Transactional 덕분에 comment.updateContent()만 호출해도 자동으로 DB에 반영됨
-        comment.updateContent(dto.content());
+        // 엔티티가 값 검증하고 업데이트함.
+        comment.update(dto.content());
     }
 
     // 댓글 삭제
