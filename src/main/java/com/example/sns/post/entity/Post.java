@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -25,10 +27,10 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
-    @Column
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,7 +41,6 @@ public class Post {
         this.title = title;
         this.content = content;
         this.user = user;
-        this.createdAt = LocalDateTime.now();
     }
 
     public static Post createPost(String title, String content, User user) {
@@ -55,7 +56,6 @@ public class Post {
         validateContent(content);
         this.title = title;
         this.content = content;
-        this.updatedAt = LocalDateTime.now(); // 자동으로 함께 업데이트
     }
 
 

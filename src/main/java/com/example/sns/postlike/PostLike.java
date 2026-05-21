@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -32,13 +33,12 @@ public class PostLike {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Column
+    @CreatedDate
     private LocalDateTime createdAt;
 
     public PostLike(User user, Post post) {
         this.user = user;
         this.post = post;
-        this.createdAt = LocalDateTime.now();
     }
 
 }

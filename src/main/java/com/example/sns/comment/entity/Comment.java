@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -31,10 +33,10 @@ public class Comment {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Column
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
 
@@ -42,7 +44,6 @@ public class Comment {
         this.content = content;
         this.user = user;
         this.post = post;
-        this.createdAt = LocalDateTime.now();
     }
 
     public static Comment createComment(String content, User user, Post post) {
@@ -53,7 +54,6 @@ public class Comment {
 
     public void update(String content) {
         this.content = content;
-        this.updatedAt = LocalDateTime.now();
     }
 
 
