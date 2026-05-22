@@ -4,6 +4,7 @@ import com.example.sns.dto.PostCreateRequest;
 import com.example.sns.dto.PostResponse;
 import com.example.sns.dto.PostUpdateRequest;
 import com.example.sns.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,8 +25,14 @@ public class PostController {
 
     // 게시글 작성
     @PostMapping
-    public ResponseEntity<PostResponse> createPost(@RequestBody PostCreateRequest request) {
-        PostResponse response = postService.createPost(request);
+    public ResponseEntity<PostResponse> createPost(
+            @RequestBody PostCreateRequest request,
+            HttpServletRequest httpServletRequest
+    ) {
+        Long userId = (Long) httpServletRequest.getAttribute("userId");
+
+        PostResponse response = postService.createPost(userId, request);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

@@ -4,6 +4,7 @@ import com.example.sns.dto.LikeCountResponse;
 import com.example.sns.dto.LikeCreateRequest;
 import com.example.sns.dto.LikeResponse;
 import com.example.sns.service.LikeService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,14 @@ public class LikeController {
 
     // 좋아요 누르기
     @PostMapping("/likes")
-    public ResponseEntity<LikeResponse> createLike(@RequestBody LikeCreateRequest request) {
-        LikeResponse response = likeService.createLike(request);
+    public ResponseEntity<LikeResponse> createLike(
+            @RequestBody LikeCreateRequest request,
+            HttpServletRequest httpServletRequest
+    ) {
+        Long userId = (Long) httpServletRequest.getAttribute("userId");
+
+        LikeResponse response = likeService.createLike(userId, request);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -47,23 +54,29 @@ public class LikeController {
         return ResponseEntity.ok(response);
     }
 
-    // 사용자와 게시글 기준으로 좋아요 단건 조회
-    @GetMapping("/posts/{postId}/likes/users/{userId}")
-    public ResponseEntity<LikeResponse> getLikeByUserAndPost(
+    // 로그인한 사용자가 해당 게시글에 누른 좋아요 조회
+    @GetMapping("/posts/{postId}/likes/me")
+    public ResponseEntity<LikeResponse> getMyLikeByPost(
             @PathVariable Long postId,
-            @PathVariable Long userId
+            HttpServletRequest httpServletRequest
     ) {
+        Long userId = (Long) httpServletRequest.getAttribute("userId");
+
         LikeResponse response = likeService.getLikeByUserAndPost(userId, postId);
+
         return ResponseEntity.ok(response);
     }
 
-    // 사용자와 게시글 기준으로 좋아요 취소
-    @DeleteMapping("/posts/{postId}/likes/users/{userId}")
-    public ResponseEntity<Void> deleteLikeByUserAndPost(
+    // 로그인한 사용자의 좋아요 취소
+    @DeleteMapping("/posts/{postId}/likes/me")
+    public ResponseEntity<Void> deleteMyLikeByPost(
             @PathVariable Long postId,
-            @PathVariable Long userId
+            HttpServletRequest httpServletRequest
     ) {
+        Long userId = (Long) httpServletRequest.getAttribute("userId");
+
         likeService.deleteLikeByUserAndPost(userId, postId);
+
         return ResponseEntity.noContent().build();
     }
 }

@@ -7,6 +7,7 @@ import com.example.sns.entity.Comment;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
 import com.example.sns.exception.CustomException;
+import com.example.sns.exception.ErrorCode;
 import com.example.sns.repository.CommentRepository;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
@@ -36,12 +37,12 @@ public class CommentService {
 
     // 댓글 작성
     @Transactional
-    public CommentResponse createComment(CommentCreateRequest request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new CustomException("존재하지 않는 사용자입니다."));
+    public CommentResponse createComment(Long userId, CommentCreateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Post post = postRepository.findById(request.postId())
-                .orElseThrow(() -> new CustomException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         Comment comment = Comment.create(
                 request.content(),
@@ -63,7 +64,7 @@ public class CommentService {
     // 특정 게시글의 댓글 조회
     public Page<CommentResponse> getCommentsByPost(Long postId, Pageable pageable) {
         postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         return commentRepository.findByPostId(postId, pageable)
                 .map(CommentResponse::from);
@@ -72,7 +73,7 @@ public class CommentService {
     // 댓글 단건 조회
     public CommentResponse getComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
 
         return CommentResponse.from(comment);
     }
@@ -81,7 +82,7 @@ public class CommentService {
     @Transactional
     public CommentResponse updateComment(Long commentId, CommentUpdateRequest request) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
 
         comment.update(request.content());
 
@@ -92,7 +93,7 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
 
         commentRepository.delete(comment);
     }

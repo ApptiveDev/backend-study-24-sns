@@ -6,6 +6,7 @@ import com.example.sns.dto.PostUpdateRequest;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
 import com.example.sns.exception.CustomException;
+import com.example.sns.exception.ErrorCode;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -27,9 +28,9 @@ public class PostService {
 
     // 게시글 작성
     @Transactional
-    public PostResponse createPost(PostCreateRequest request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new CustomException("존재하지 않는 사용자입니다."));
+    public PostResponse createPost(Long userId, PostCreateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Post post = Post.create(
                 request.title(),
@@ -51,7 +52,7 @@ public class PostService {
     // 게시글 조회
     public PostResponse getPost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         return PostResponse.from(post);
     }
@@ -60,7 +61,7 @@ public class PostService {
     @Transactional
     public PostResponse updatePost(Long postId, PostUpdateRequest request) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         post.update(request.title(), request.content());
 
@@ -71,7 +72,7 @@ public class PostService {
     @Transactional
     public void deletePost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         postRepository.delete(post);
     }

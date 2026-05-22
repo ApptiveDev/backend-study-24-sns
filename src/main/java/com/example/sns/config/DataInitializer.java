@@ -16,7 +16,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        User user = User.create("test@test.com", "테스트유저");
+        User user = User.create("test@test.com", "테스트유저", "1234");
 
         userRepository.save(user);
     }

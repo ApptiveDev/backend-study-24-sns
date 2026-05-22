@@ -21,3 +21,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+jwt:
+  secret-key: my-super-secret-key-for-jwt-authentication-123456
+  access-token-expire-time: 3600000

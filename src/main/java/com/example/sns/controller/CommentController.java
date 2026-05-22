@@ -4,6 +4,7 @@ import com.example.sns.dto.CommentCreateRequest;
 import com.example.sns.dto.CommentResponse;
 import com.example.sns.dto.CommentUpdateRequest;
 import com.example.sns.service.CommentService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,8 +24,14 @@ public class CommentController {
 
     // 댓글 작성
     @PostMapping("/comments")
-    public ResponseEntity<CommentResponse> createComment(@RequestBody CommentCreateRequest request) {
-        CommentResponse response = commentService.createComment(request);
+    public ResponseEntity<CommentResponse> createComment(
+            @RequestBody CommentCreateRequest request,
+            HttpServletRequest httpServletRequest
+    ) {
+        Long userId = (Long) httpServletRequest.getAttribute("userId");
+
+        CommentResponse response = commentService.createComment(userId, request);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
