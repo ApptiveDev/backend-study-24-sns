@@ -5,6 +5,7 @@ import com.example.sns.dto.PostResponse;
 import com.example.sns.dto.PostUpdateRequest;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
+import com.example.sns.exception.CustomException;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -88,8 +93,8 @@ class PostServiceTest {
                 .willReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        CustomException exception = assertThrows(
+                CustomException.class,
                 () -> postService.createPost(request)
         );
 
@@ -112,18 +117,23 @@ class PostServiceTest {
         Post post2 = Post.create("두 번째 게시글", "내용2", user);
         ReflectionTestUtils.setField(post2, "id", 2L);
 
-        given(postRepository.findAll())
-                .willReturn(List.of(post1, post2));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Post> postPage = new PageImpl<>(List.of(post1, post2), pageable, 2);
+
+        given(postRepository.findAll(pageable))
+                .willReturn(postPage);
 
         // When
-        List<PostResponse> responses = postService.getPosts();
+        Page<PostResponse> responses = postService.getPosts(pageable);
 
         // Then
-        assertEquals(2, responses.size());
-        assertEquals("첫 번째 게시글", responses.get(0).title());
-        assertEquals("두 번째 게시글", responses.get(1).title());
+        assertEquals(2, responses.getContent().size());
+        assertEquals("첫 번째 게시글", responses.getContent().get(0).title());
+        assertEquals("두 번째 게시글", responses.getContent().get(1).title());
+        assertEquals(2, responses.getTotalElements());
+        assertEquals(1, responses.getTotalPages());
 
-        verify(postRepository, times(1)).findAll();
+        verify(postRepository, times(1)).findAll(pageable);
     }
 
     @Test
@@ -160,8 +170,8 @@ class PostServiceTest {
                 .willReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        CustomException exception = assertThrows(
+                CustomException.class,
                 () -> postService.getPost(999L)
         );
 

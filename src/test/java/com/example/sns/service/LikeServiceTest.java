@@ -6,6 +6,7 @@ import com.example.sns.dto.LikeResponse;
 import com.example.sns.entity.Like;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
+import com.example.sns.exception.CustomException;
 import com.example.sns.repository.LikeRepository;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
@@ -107,8 +108,8 @@ class LikeServiceTest {
                 .willReturn(true);
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        CustomException exception = assertThrows(
+                CustomException.class,
                 () -> likeService.createLike(request)
         );
 
@@ -127,8 +128,8 @@ class LikeServiceTest {
                 .willReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        CustomException exception = assertThrows(
+                CustomException.class,
                 () -> likeService.createLike(request)
         );
 
@@ -155,8 +156,8 @@ class LikeServiceTest {
                 .willReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        CustomException exception = assertThrows(
+                CustomException.class,
                 () -> likeService.createLike(request)
         );
 
@@ -198,8 +199,8 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("좋아요 단건 조회에 성공한다")
-    void getLike_success() {
+    @DisplayName("사용자와 게시글 기준으로 좋아요 단건 조회에 성공한다")
+    void getLikeByUserAndPost_success() {
         // Given
         User user = User.create("test@test.com", "테스트유저");
         ReflectionTestUtils.setField(user, "id", 1L);
@@ -210,18 +211,18 @@ class LikeServiceTest {
         Like like = Like.create(user, post);
         ReflectionTestUtils.setField(like, "id", 1L);
 
-        given(likeRepository.findById(1L))
+        given(likeRepository.findByUserIdAndPostId(1L, 1L))
                 .willReturn(Optional.of(like));
 
         // When
-        LikeResponse response = likeService.getLike(1L);
+        LikeResponse response = likeService.getLikeByUserAndPost(1L, 1L);
 
         // Then
         assertEquals(1L, response.likeId());
         assertEquals(1L, response.userId());
         assertEquals(1L, response.postId());
 
-        verify(likeRepository, times(1)).findById(1L);
+        verify(likeRepository, times(1)).findByUserIdAndPostId(1L, 1L);
     }
 
     @Test
@@ -279,30 +280,6 @@ class LikeServiceTest {
 
         verify(postRepository, times(1)).findById(1L);
         verify(likeRepository, times(1)).countByPostId(1L);
-    }
-
-    @Test
-    @DisplayName("좋아요 삭제에 성공한다")
-    void deleteLike_success() {
-        // Given
-        User user = User.create("test@test.com", "테스트유저");
-        ReflectionTestUtils.setField(user, "id", 1L);
-
-        Post post = Post.create("게시글 제목", "게시글 내용", user);
-        ReflectionTestUtils.setField(post, "id", 1L);
-
-        Like like = Like.create(user, post);
-        ReflectionTestUtils.setField(like, "id", 1L);
-
-        given(likeRepository.findById(1L))
-                .willReturn(Optional.of(like));
-
-        // When
-        likeService.deleteLike(1L);
-
-        // Then
-        verify(likeRepository, times(1)).findById(1L);
-        verify(likeRepository, times(1)).delete(like);
     }
 
     @Test

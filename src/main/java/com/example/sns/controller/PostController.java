@@ -4,15 +4,18 @@ import com.example.sns.dto.PostCreateRequest;
 import com.example.sns.dto.PostResponse;
 import com.example.sns.dto.PostUpdateRequest;
 import com.example.sns.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/posts")
 public class PostController {
+
     private final PostService postService;
 
     public PostController(PostService postService) {
@@ -28,8 +31,11 @@ public class PostController {
 
     // 게시글 전체 조회
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getPosts() {
-        List<PostResponse> response = postService.getPosts();
+    public ResponseEntity<Page<PostResponse>> getPosts(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        Page<PostResponse> response = postService.getPosts(pageable);
         return ResponseEntity.ok(response);
     }
 

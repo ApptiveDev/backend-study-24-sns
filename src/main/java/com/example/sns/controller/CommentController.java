@@ -4,11 +4,13 @@ import com.example.sns.dto.CommentCreateRequest;
 import com.example.sns.dto.CommentResponse;
 import com.example.sns.dto.CommentUpdateRequest;
 import com.example.sns.service.CommentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 public class CommentController {
@@ -28,15 +30,22 @@ public class CommentController {
 
     // 댓글 전체 조회
     @GetMapping("/comments")
-    public ResponseEntity<List<CommentResponse>> getComments() {
-        List<CommentResponse> response = commentService.getComments();
+    public ResponseEntity<Page<CommentResponse>> getComments(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        Page<CommentResponse> response = commentService.getComments(pageable);
         return ResponseEntity.ok(response);
     }
 
     // 특정 게시글의 댓글 조회
     @GetMapping("/posts/{postId}/comments")
-    public ResponseEntity<List<CommentResponse>> getCommentsByPost(@PathVariable Long postId) {
-        List<CommentResponse> response = commentService.getCommentsByPost(postId);
+    public ResponseEntity<Page<CommentResponse>> getCommentsByPost(
+            @PathVariable Long postId,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        Page<CommentResponse> response = commentService.getCommentsByPost(postId, pageable);
         return ResponseEntity.ok(response);
     }
 

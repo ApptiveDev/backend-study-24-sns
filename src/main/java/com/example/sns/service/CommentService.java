@@ -6,13 +6,15 @@ import com.example.sns.dto.CommentUpdateRequest;
 import com.example.sns.entity.Comment;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
+import com.example.sns.exception.CustomException;
 import com.example.sns.repository.CommentRepository;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,10 +38,10 @@ public class CommentService {
     @Transactional
     public CommentResponse createComment(CommentCreateRequest request) {
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new CustomException("존재하지 않는 사용자입니다."));
 
         Post post = postRepository.findById(request.postId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new CustomException("존재하지 않는 게시글입니다."));
 
         Comment comment = Comment.create(
                 request.content(),
@@ -53,28 +55,24 @@ public class CommentService {
     }
 
     // 댓글 전체 조회
-    public List<CommentResponse> getComments() {
-        return commentRepository.findAll()
-                .stream()
-                .map(CommentResponse::from)
-                .toList();
+    public Page<CommentResponse> getComments(Pageable pageable) {
+        return commentRepository.findAll(pageable)
+                .map(CommentResponse::from);
     }
 
     // 특정 게시글의 댓글 조회
-    public List<CommentResponse> getCommentsByPost(Long postId) {
+    public Page<CommentResponse> getCommentsByPost(Long postId, Pageable pageable) {
         postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new CustomException("존재하지 않는 게시글입니다."));
 
-        return commentRepository.findByPostId(postId)
-                .stream()
-                .map(CommentResponse::from)
-                .toList();
+        return commentRepository.findByPostId(postId, pageable)
+                .map(CommentResponse::from);
     }
 
     // 댓글 단건 조회
     public CommentResponse getComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new CustomException("존재하지 않는 댓글입니다."));
 
         return CommentResponse.from(comment);
     }
@@ -83,7 +81,7 @@ public class CommentService {
     @Transactional
     public CommentResponse updateComment(Long commentId, CommentUpdateRequest request) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new CustomException("존재하지 않는 댓글입니다."));
 
         comment.update(request.content());
 
@@ -94,7 +92,7 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new CustomException("존재하지 않는 댓글입니다."));
 
         commentRepository.delete(comment);
     }

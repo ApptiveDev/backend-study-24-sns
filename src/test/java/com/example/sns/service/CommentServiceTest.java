@@ -6,6 +6,7 @@ import com.example.sns.dto.CommentUpdateRequest;
 import com.example.sns.entity.Comment;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
+import com.example.sns.exception.CustomException;
 import com.example.sns.repository.CommentRepository;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
@@ -15,6 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -100,8 +105,8 @@ class CommentServiceTest {
                 .willReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        CustomException exception = assertThrows(
+                CustomException.class,
                 () -> commentService.createComment(request)
         );
 
@@ -132,8 +137,8 @@ class CommentServiceTest {
                 .willReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        CustomException exception = assertThrows(
+                CustomException.class,
                 () -> commentService.createComment(request)
         );
 
@@ -160,18 +165,23 @@ class CommentServiceTest {
         Comment comment2 = Comment.create("두 번째 댓글", user, post);
         ReflectionTestUtils.setField(comment2, "id", 2L);
 
-        given(commentRepository.findAll())
-                .willReturn(List.of(comment1, comment2));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Comment> commentPage = new PageImpl<>(List.of(comment1, comment2), pageable, 2);
+
+        given(commentRepository.findAll(pageable))
+                .willReturn(commentPage);
 
         // When
-        List<CommentResponse> responses = commentService.getComments();
+        Page<CommentResponse> responses = commentService.getComments(pageable);
 
         // Then
-        assertEquals(2, responses.size());
-        assertEquals("첫 번째 댓글", responses.get(0).content());
-        assertEquals("두 번째 댓글", responses.get(1).content());
+        assertEquals(2, responses.getContent().size());
+        assertEquals("첫 번째 댓글", responses.getContent().get(0).content());
+        assertEquals("두 번째 댓글", responses.getContent().get(1).content());
+        assertEquals(2, responses.getTotalElements());
+        assertEquals(1, responses.getTotalPages());
 
-        verify(commentRepository, times(1)).findAll();
+        verify(commentRepository, times(1)).findAll(pageable);
     }
 
     @Test
@@ -187,21 +197,26 @@ class CommentServiceTest {
         Comment comment = Comment.create("게시글에 달린 댓글", user, post);
         ReflectionTestUtils.setField(comment, "id", 1L);
 
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Comment> commentPage = new PageImpl<>(List.of(comment), pageable, 1);
+
         given(postRepository.findById(1L))
                 .willReturn(Optional.of(post));
 
-        given(commentRepository.findByPostId(1L))
-                .willReturn(List.of(comment));
+        given(commentRepository.findByPostId(1L, pageable))
+                .willReturn(commentPage);
 
         // When
-        List<CommentResponse> responses = commentService.getCommentsByPost(1L);
+        Page<CommentResponse> responses = commentService.getCommentsByPost(1L, pageable);
 
         // Then
-        assertEquals(1, responses.size());
-        assertEquals("게시글에 달린 댓글", responses.get(0).content());
+        assertEquals(1, responses.getContent().size());
+        assertEquals("게시글에 달린 댓글", responses.getContent().get(0).content());
+        assertEquals(1, responses.getTotalElements());
+        assertEquals(1, responses.getTotalPages());
 
         verify(postRepository, times(1)).findById(1L);
-        verify(commentRepository, times(1)).findByPostId(1L);
+        verify(commentRepository, times(1)).findByPostId(1L, pageable);
     }
 
     @Test
@@ -238,8 +253,8 @@ class CommentServiceTest {
                 .willReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        CustomException exception = assertThrows(
+                CustomException.class,
                 () -> commentService.getComment(999L)
         );
 
