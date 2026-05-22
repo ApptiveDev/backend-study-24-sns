@@ -65,10 +65,10 @@ public class LikeService {
                 .toList();
     }
 
-    // 좋아요 단건 조회
-    public LikeResponse getLike(Long likeId) {
-        Like like = likeRepository.findById(likeId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좋아요입니다."));
+    // 사용자와 게시글 기준으로 좋아요 단건 조회
+    public LikeResponse getLikeByUserAndPost(Long userId, Long postId) {
+        Like like = likeRepository.findByUserIdAndPostId(userId, postId)
+                .orElseThrow(() -> new IllegalArgumentException("좋아요를 누른 기록이 없습니다."));
 
         return LikeResponse.from(like);
     }
@@ -92,15 +92,6 @@ public class LikeService {
         long likeCount = likeRepository.countByPostId(postId);
 
         return new LikeCountResponse(postId, likeCount);
-    }
-
-    // 좋아요 취소
-    @Transactional
-    public void deleteLike(Long likeId) {
-        Like like = likeRepository.findById(likeId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좋아요입니다."));
-
-        likeRepository.delete(like);
     }
 
     // 사용자와 게시글 기준으로 좋아요 취소

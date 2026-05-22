@@ -17,20 +17,29 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 사용자 이메일
+    @Column(nullable = false, length = 100)
     private String email;
 
+    // 사용자 닉네임
+    @Column(nullable = false, length = 50)
     private String nickname;
 
-    @Column(name = "created_at")
+    // 사용자 생성 시간
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     private User(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
-        this.createdAt = LocalDateTime.now();
     }
 
     public static User create(String email, String nickname) {
         return new User(email, nickname);
+    }
+
+    @PrePersist
+    private void prePersist() {
+        this.createdAt = LocalDateTime.now();
     }
 }

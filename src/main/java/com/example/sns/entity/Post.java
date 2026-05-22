@@ -17,27 +17,31 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 게시글 제목
+    @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    // 게시글 내용
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    // 게시글을 작성한 사용자
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "created_at")
+    // 게시글 생성 시간
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    // 게시글 수정 시간
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     private Post(String title, String content, User user) {
         this.title = title;
         this.content = content;
         this.user = user;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     public static Post create(String title, String content, User user) {
@@ -49,8 +53,14 @@ public class Post {
         this.content = content;
     }
 
+    @PrePersist
+    private void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
     @PreUpdate
-    private void updateUpdatedAt() {
+    private void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 }

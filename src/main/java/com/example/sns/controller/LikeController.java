@@ -33,13 +33,6 @@ public class LikeController {
         return ResponseEntity.ok(response);
     }
 
-    // 좋아요 단건 조회
-    @GetMapping("/likes/{likeId}")
-    public ResponseEntity<LikeResponse> getLike(@PathVariable Long likeId) {
-        LikeResponse response = likeService.getLike(likeId);
-        return ResponseEntity.ok(response);
-    }
-
     // 특정 게시글 좋아요 목록 조회
     @GetMapping("/posts/{postId}/likes")
     public ResponseEntity<List<LikeResponse>> getLikesByPost(@PathVariable Long postId) {
@@ -54,11 +47,14 @@ public class LikeController {
         return ResponseEntity.ok(response);
     }
 
-    // 좋아요 취소
-    @DeleteMapping("/likes/{likeId}")
-    public ResponseEntity<Void> deleteLike(@PathVariable Long likeId) {
-        likeService.deleteLike(likeId);
-        return ResponseEntity.noContent().build();
+    // 사용자와 게시글 기준으로 좋아요 단건 조회
+    @GetMapping("/posts/{postId}/likes/users/{userId}")
+    public ResponseEntity<LikeResponse> getLikeByUserAndPost(
+            @PathVariable Long postId,
+            @PathVariable Long userId
+    ) {
+        LikeResponse response = likeService.getLikeByUserAndPost(userId, postId);
+        return ResponseEntity.ok(response);
     }
 
     // 사용자와 게시글 기준으로 좋아요 취소
