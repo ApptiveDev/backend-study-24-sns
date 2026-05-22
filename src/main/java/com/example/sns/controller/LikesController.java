@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.sns.service.LikesService;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import com.example.sns.dto.LikesResponseDto;
@@ -22,7 +21,7 @@ public class LikesController {
     private final LikesService likesService;
 
     @PostMapping
-    public ResponseEntity<LikesResponseDto> toggleLike(@PathVariable("postId") Long postId, @Valid @RequestAttribute("loginUserId") Long loginUserId){
+    public ResponseEntity<LikesResponseDto> toggleLike(@PathVariable("postId") Long postId, @RequestAttribute("loginUserId") Long loginUserId){
         LikesResponseDto responseDto = likesService.toggleLike(postId, loginUserId);
         return ResponseEntity.ok(responseDto);
     }

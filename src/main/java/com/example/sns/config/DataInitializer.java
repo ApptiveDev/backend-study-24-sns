@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 
 import com.example.sns.entity.Likes;
@@ -15,7 +16,6 @@ import com.example.sns.repository.LikesRepository;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Component

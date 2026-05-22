@@ -1,7 +1,7 @@
 package com.example.sns.auth;
 
 import java.nio.charset.StandardCharsets;
-import java.sql.Date;
+import java.util.Date;
 import java.time.Instant;
 
 import javax.crypto.SecretKey;
