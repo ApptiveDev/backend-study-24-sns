@@ -1,8 +1,7 @@
 package com.example.sns.controller;
 
-import com.example.sns.dto.LikeRequest;
+import com.example.sns.auth.AuthInterceptor;
 import com.example.sns.service.LikeService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +9,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,18 +23,18 @@ public class LikeController {
     @PostMapping
     public ResponseEntity<Void> addLike(
             @PathVariable Long postId,
-            @Valid @RequestBody LikeRequest request
+            @RequestAttribute(AuthInterceptor.AUTH_USER_ID) Long authUserId
     ) {
-        likeService.addLike(postId, request.getUserId());
+        likeService.addLike(postId, authUserId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> removeLike(
             @PathVariable Long postId,
-            @RequestParam Long userId
+            @RequestAttribute(AuthInterceptor.AUTH_USER_ID) Long authUserId
     ) {
-        likeService.removeLike(postId, userId);
+        likeService.removeLike(postId, authUserId);
         return ResponseEntity.noContent().build();
     }
 

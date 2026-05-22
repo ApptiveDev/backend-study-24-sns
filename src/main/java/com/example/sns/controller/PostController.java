@@ -1,5 +1,6 @@
 package com.example.sns.controller;
 
+import com.example.sns.auth.AuthInterceptor;
 import com.example.sns.dto.PostCreateRequest;
 import com.example.sns.dto.PostResponse;
 import com.example.sns.dto.PostUpdateRequest;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,8 +29,11 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<PostResponse> create(@Valid @RequestBody PostCreateRequest request) {
-        PostResponse response = postService.create(request);
+    public ResponseEntity<PostResponse> create(
+            @RequestAttribute(AuthInterceptor.AUTH_USER_ID) Long authUserId,
+            @Valid @RequestBody PostCreateRequest request
+    ) {
+        PostResponse response = postService.create(authUserId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -48,14 +53,18 @@ public class PostController {
     @PatchMapping("/{postId}")
     public ResponseEntity<PostResponse> update(
             @PathVariable Long postId,
+            @RequestAttribute(AuthInterceptor.AUTH_USER_ID) Long authUserId,
             @Valid @RequestBody PostUpdateRequest request
     ) {
-        return ResponseEntity.ok(postService.update(postId, request));
+        return ResponseEntity.ok(postService.update(postId, authUserId, request));
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> delete(@PathVariable Long postId) {
-        postService.delete(postId);
+    public ResponseEntity<Void> delete(
+            @PathVariable Long postId,
+            @RequestAttribute(AuthInterceptor.AUTH_USER_ID) Long authUserId
+    ) {
+        postService.delete(postId, authUserId);
         return ResponseEntity.noContent().build();
     }
 }

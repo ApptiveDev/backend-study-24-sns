@@ -22,3 +22,11 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+
+jwt:
+  secret: change-this-secret-key-for-local-study
+  access-token-expiration-seconds: 3600
+  refresh-token-expiration-days: 14
+
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:5173

@@ -1,5 +1,6 @@
 package com.example.sns.controller;
 
+import com.example.sns.auth.AuthInterceptor;
 import com.example.sns.dto.UserCreateRequest;
 import com.example.sns.dto.UserResponse;
 import com.example.sns.dto.UserUpdateRequest;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,14 +47,18 @@ public class UserController {
     @PatchMapping("/{userId}")
     public ResponseEntity<UserResponse> update(
             @PathVariable Long userId,
+            @RequestAttribute(AuthInterceptor.AUTH_USER_ID) Long authUserId,
             @Valid @RequestBody UserUpdateRequest request
     ) {
-        return ResponseEntity.ok(userService.update(userId, request));
+        return ResponseEntity.ok(userService.update(userId, authUserId, request));
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> delete(@PathVariable Long userId) {
-        userService.delete(userId);
+    public ResponseEntity<Void> delete(
+            @PathVariable Long userId,
+            @RequestAttribute(AuthInterceptor.AUTH_USER_ID) Long authUserId
+    ) {
+        userService.delete(userId, authUserId);
         return ResponseEntity.noContent().build();
     }
 }

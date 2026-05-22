@@ -6,6 +6,7 @@ import com.example.sns.dto.UserUpdateRequest;
 import com.example.sns.entity.User;
 import com.example.sns.exception.BadRequestException;
 import com.example.sns.exception.ErrorCode;
+import com.example.sns.exception.ForbiddenException;
 import com.example.sns.exception.NotFoundException;
 import com.example.sns.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,8 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse update(Long userId, UserUpdateRequest request) {
+    public UserResponse update(Long userId, Long authUserId, UserUpdateRequest request) {
+        validateOwner(userId, authUserId);
         User user = getUser(userId);
         user.update(request.getNickname());
 
@@ -54,9 +56,16 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(Long userId) {
+    public void delete(Long userId, Long authUserId) {
+        validateOwner(userId, authUserId);
         User user = getUser(userId);
         userRepository.delete(user);
+    }
+
+    private void validateOwner(Long userId, Long authUserId) {
+        if (!userId.equals(authUserId)) {
+            throw new ForbiddenException(ErrorCode.FORBIDDEN);
+        }
     }
 
     private User getUser(Long userId) {

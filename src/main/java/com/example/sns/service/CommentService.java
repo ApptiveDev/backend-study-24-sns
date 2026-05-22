@@ -7,6 +7,7 @@ import com.example.sns.entity.Comment;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
 import com.example.sns.exception.ErrorCode;
+import com.example.sns.exception.ForbiddenException;
 import com.example.sns.exception.NotFoundException;
 import com.example.sns.repository.CommentRepository;
 import com.example.sns.repository.PostRepository;
@@ -27,9 +28,9 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public CommentResponse create(CommentCreateRequest request) {
+    public CommentResponse create(Long authUserId, CommentCreateRequest request) {
         Post post = getPost(request.getPostId());
-        User user = getUser(request.getUserId());
+        User user = getUser(authUserId);
 
         Comment comment = new Comment(post, user, request.getContent());
         Comment savedComment = commentRepository.save(comment);
@@ -50,15 +51,17 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse update(Long commentId, CommentUpdateRequest request) {
+    public CommentResponse update(Long commentId, Long authUserId, CommentUpdateRequest request) {
         Comment comment = getComment(commentId);
+        validateOwner(comment, authUserId);
         comment.update(request.getContent());
         return CommentResponse.from(comment);
     }
 
     @Transactional
-    public void delete(Long commentId) {
+    public void delete(Long commentId, Long authUserId) {
         Comment comment = getComment(commentId);
+        validateOwner(comment, authUserId);
         commentRepository.delete(comment);
     }
 
@@ -75,5 +78,11 @@ public class CommentService {
     private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private void validateOwner(Comment comment, Long authUserId) {
+        if (!comment.getUser().getId().equals(authUserId)) {
+            throw new ForbiddenException(ErrorCode.FORBIDDEN);
+        }
     }
 }
