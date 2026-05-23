@@ -1,6 +1,5 @@
 package com.example.sns.service;
 
-import com.example.sns.entity.Like;
 import com.example.sns.exception.PostNotFoundException;
 import com.example.sns.repository.LikeRepository;
 import com.example.sns.repository.PostRepository;

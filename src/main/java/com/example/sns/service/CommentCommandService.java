@@ -6,6 +6,7 @@ import com.example.sns.dto.CommentUpdateRequest;
 import com.example.sns.entity.Comment;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
+import com.example.sns.exception.CommentNotFoundException;
 import com.example.sns.exception.PostNotFoundException;
 import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.repository.PostRepository;
@@ -38,12 +39,7 @@ public class CommentCommandService {
         Post post = findPostWithDetails(postId);
         User requester = findUser(request.requesterId());
 
-        post.editComment(commentId, request.content(), requester);
-
-        Comment editedComment = post.getComments().stream()
-                .filter(comment -> comment.getId().equals(commentId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+        Comment editedComment = post.editComment(commentId, request.content(), requester);
 
         return CommentResponse.from(editedComment);
     }

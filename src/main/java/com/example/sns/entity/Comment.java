@@ -1,10 +1,10 @@
 package com.example.sns.entity;
 
+import com.example.sns.exception.ForbiddenException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
@@ -73,7 +73,7 @@ public class Comment {
 
     private void validateAuthor(User requester) {
         if (!isWrittenBy(requester)) {
-            throw new IllegalArgumentException("댓글 작성자만 수정할 수 있습니다.");
+            throw new ForbiddenException("댓글 작성자만 수정할 수 있습니다.");
         }
     }
 

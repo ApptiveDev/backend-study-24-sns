@@ -41,5 +41,6 @@ public class LikeCommandService {
     public void unlikePost(Long postId, Long userId) {
         Like like = likeRepository.findByUserIdAndPostId(userId, postId)
                 .orElseThrow(LikeNotFoundException::new);
+        likeRepository.delete(like);
     }
 }

@@ -1,5 +1,7 @@
 package com.example.sns.entity;
 
+import com.example.sns.exception.CommentNotFoundException;
+import com.example.sns.exception.ForbiddenException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -76,16 +78,17 @@ public class Post {
         return comment;
     }
 
-    public void editComment(Long commentId, String newContent, User requester) {
+    public Comment editComment(Long commentId, String newContent, User requester) {
         Comment comment = findComment(commentId);
         comment.edit(newContent, requester);
+        return comment;
     }
 
     public void removeComment(Long commentId, User requester) {
         Comment comment = findComment(commentId);
 
         if (!comment.isWrittenBy(requester) && !this.isWrittenBy(requester)) {
-            throw new IllegalArgumentException("댓글 삭제 권한이 없습니다.");
+            throw new ForbiddenException("댓글 삭제 권한이 없습니다.");
         }
 
         this.comments.remove(comment);
@@ -99,7 +102,7 @@ public class Post {
         return this.comments.stream()
                 .filter(comment -> comment.getId().equals(commentId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글에 존재하지 않는 댓글입니다."));
+                .orElseThrow(CommentNotFoundException::new);
     }
 
     public boolean isWrittenBy(User user) {

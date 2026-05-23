@@ -35,28 +35,26 @@ public class PostService {
 
     @Transactional
     public void update(Long postId, PostUpdateRequest request) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(PostNotFoundException::new);
+        Post post = findPost(postId);
 
         post.update(request.title(), request.content());
     }
 
     @Transactional
     public void delete(Long postId) {
-        Post post = postRepository.findById(postId)
-                        .orElseThrow(PostNotFoundException::new);
+        Post post = findPost(postId);
+
         postRepository.delete(post);
     }
 
     public List<PostResponse> findAllPost() {
-        List<Post> posts = postRepository.findAllWithAuthor();
-        List<PostResponse> postResponses = new ArrayList<>();
-        for (Post post : posts) {
-            postResponses.add(PostResponse.from(post));
-        }
-
-        return postResponses;
+        return postRepository.findAllWithAuthor().stream()
+                .map(PostResponse::from)
+                .toList();
     }
 
-
+    private Post findPost(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
+    }
 }
