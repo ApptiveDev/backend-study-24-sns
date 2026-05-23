@@ -3,6 +3,7 @@ package com.example.sns.controller;
 import com.example.sns.dto.LikeCountResponse;
 import com.example.sns.service.LikeCommandService;
 import com.example.sns.service.LikeQueryService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,9 @@ public class LikeController {
     @PostMapping
     public ResponseEntity<Void> likePost(
             @PathVariable Long postId,
-            @RequestParam Long userId
+            HttpServletRequest httpRequest
     ) {
+        Long userId = (Long) httpRequest.getAttribute("userId");
         likeCommandService.likePost(postId, userId);
         return ResponseEntity.noContent().build();
     }
@@ -26,8 +28,9 @@ public class LikeController {
     @DeleteMapping
     public ResponseEntity<Void> unlikePost(
             @PathVariable Long postId,
-            @RequestParam Long userId
+            HttpServletRequest httpRequest
     ) {
+        Long userId = (Long) httpRequest.getAttribute("userId");
         likeCommandService.unlikePost(postId, userId);
         return ResponseEntity.noContent().build();
     }

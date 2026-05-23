@@ -5,6 +5,7 @@ import com.example.sns.dto.CommentResponse;
 import com.example.sns.dto.CommentUpdateRequest;
 import com.example.sns.service.CommentCommandService;
 import com.example.sns.service.CommentQueryService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,11 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<CommentResponse> createComment(
             @PathVariable Long postId,
-            @RequestBody CommentCreateRequest request
+            @RequestBody CommentCreateRequest request,
+            HttpServletRequest httpRequest
     ) {
-        CommentResponse response = commentCommandService.addComment(postId, request);
+        Long userId = (Long) httpRequest.getAttribute("userId");
+        CommentResponse response = commentCommandService.addComment(postId, userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -40,9 +43,11 @@ public class CommentController {
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
-            @RequestBody CommentUpdateRequest request
+            @RequestBody CommentUpdateRequest request,
+            HttpServletRequest httpRequest
     ) {
-        CommentResponse response = commentCommandService.editComment(postId, commentId, request);
+        Long userId = (Long) httpRequest.getAttribute("userId");
+        CommentResponse response = commentCommandService.editComment(postId, commentId, userId, request);
         return ResponseEntity.ok(response);
     }
 
@@ -50,9 +55,10 @@ public class CommentController {
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
-            @RequestParam Long requesterId
+            HttpServletRequest httpRequest
     ) {
-        commentCommandService.removeComment(postId, commentId, requesterId);
+        Long userId = (Long) httpRequest.getAttribute("userId");
+        commentCommandService.removeComment(postId, commentId, userId);
         return ResponseEntity.noContent().build();
     }
 }

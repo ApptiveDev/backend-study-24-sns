@@ -6,12 +6,10 @@ import com.example.sns.dto.CommentUpdateRequest;
 import com.example.sns.entity.Comment;
 import com.example.sns.entity.Post;
 import com.example.sns.entity.User;
-import com.example.sns.exception.CommentNotFoundException;
 import com.example.sns.exception.PostNotFoundException;
 import com.example.sns.exception.UserNotFoundException;
 import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,31 +20,29 @@ import org.springframework.stereotype.Service;
 public class CommentCommandService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final EntityManager entityManager;
 
-    public CommentResponse addComment(Long postId, CommentCreateRequest request) {
+    public CommentResponse addComment(Long postId, Long userId, CommentCreateRequest request) {
         Post post = findPostWithDetails(postId);
-        User commenter = findUser(request.commenterId());
+        User commenter = findUser(userId);
 
         Comment comment = post.addComment(request.content(), commenter);
 
-        entityManager.flush();
 
         return CommentResponse.from(comment);
     }
 
-    public CommentResponse editComment(Long postId, Long commentId, CommentUpdateRequest request) {
+    public CommentResponse editComment(Long postId, Long commentId, Long userId, CommentUpdateRequest request) {
         Post post = findPostWithDetails(postId);
-        User requester = findUser(request.requesterId());
+        User requester = findUser(userId);
 
         Comment editedComment = post.editComment(commentId, request.content(), requester);
 
         return CommentResponse.from(editedComment);
     }
 
-    public void removeComment(Long postId, Long commentId, Long requesterId) {
+    public void removeComment(Long postId, Long commentId, Long userId) {
         Post post = findPostWithDetails(postId);
-        User requester = findUser(requesterId);
+        User requester = findUser(userId);
 
         post.removeComment(commentId, requester);
     }
