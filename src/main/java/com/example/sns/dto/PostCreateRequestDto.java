@@ -8,7 +8,5 @@ public record PostCreateRequestDto(
         @NotBlank(message = "제목은 필수입니다.")
         String title,
         @NotBlank(message = "내용은 필수입니다.")
-        String content,
-        @NotNull
-        Long userId // 어느 유저가 쓰는지 ID값만 받음
+        String content
 ) {}

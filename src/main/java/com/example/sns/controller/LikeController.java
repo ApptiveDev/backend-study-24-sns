@@ -2,6 +2,7 @@ package com.example.sns.controller;
 
 import com.example.sns.dto.LikeResponseDto;
 import com.example.sns.service.LikeService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,8 @@ public class LikeController {
 
     // 좋아요 추가, 취소
     @PostMapping
-    public ResponseEntity<Void> toggle(@PathVariable Long postId, @RequestParam Long userId) {
+    public ResponseEntity<Void> toggle(@PathVariable Long postId, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
         likeService.toggleLike(postId, userId);
         return ResponseEntity.ok().build();
     }

@@ -7,6 +7,7 @@ import com.example.sns.dto.UserRequestDto;
 import com.example.sns.dto.UserResponseDto;
 import com.example.sns.entity.User;
 import com.example.sns.exception.DuplicateEmailException;
+import com.example.sns.exception.InvalidLoginException;
 import com.example.sns.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,11 +42,11 @@ public class UserService {
     public LoginResponseDto login(LoginRequestDto dto) {
         // 1. 이메일로 유저 찾기
         User user = userRepository.findByEmail(dto.email())
-                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
+                .orElseThrow(InvalidLoginException::new);
 
         // 2. 비밀번호 확인
         if (!user.getPassword().equals(dto.password())) {
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
+            throw new InvalidLoginException();
         }
 
         // 3. JWT 발급

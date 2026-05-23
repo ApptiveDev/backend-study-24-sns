@@ -25,10 +25,10 @@ public class PostService {
 
     // 작성
     @Transactional // 저장할 때는 쓰기 권한이 필요함
-    public void createPost(PostCreateRequestDto dto) {
+    public void createPost(PostCreateRequestDto dto, Long userId) {
         // 숫자로 된 ID를 가지고 DB에서 진짜 User 객체를 찾아옴.
-        User user = userRepository.findById(dto.userId())
-                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         Post post = new Post(dto.title(), dto.content(), user);
         postRepository.save(post);

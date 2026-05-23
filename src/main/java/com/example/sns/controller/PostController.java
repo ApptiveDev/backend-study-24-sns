@@ -4,6 +4,7 @@ import com.example.sns.dto.PostCreateRequestDto;
 import com.example.sns.dto.PostResponseDto;
 import com.example.sns.dto.PostUpdateRequestDto;
 import com.example.sns.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,9 @@ public class PostController {
 
     // 1. 게시글 작성
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody @Valid PostCreateRequestDto requestDto) {
-        postService.createPost(requestDto);
+    public ResponseEntity<String> create(@RequestBody @Valid PostCreateRequestDto requestDto, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        postService.createPost(requestDto, userId);
         // 새로운 리소스가 생성되었으므로 201 Created를 반환하는 것이 표준
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

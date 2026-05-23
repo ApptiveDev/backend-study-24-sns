@@ -29,10 +29,10 @@ public class CommentService {
 
     // 댓글 작성
     @Transactional // 쓰기 권한이 필요함
-    public void createComment(Long postId, CommentCreateRequestDto dto) {
+    public void createComment(Long postId, CommentCreateRequestDto dto, Long userId) {
         // userId로 DB에서 User 객체를 찾아옴
-        User user = userRepository.findById(dto.userId())
-                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
         // postId로 DB에서 Post 객체를 찾아옴
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));

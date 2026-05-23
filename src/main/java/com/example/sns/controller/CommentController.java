@@ -4,6 +4,7 @@ import com.example.sns.dto.CommentCreateRequestDto;
 import com.example.sns.dto.CommentResponseDto;
 import com.example.sns.dto.CommentUpdateRequestDto;
 import com.example.sns.service.CommentService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,9 @@ public class CommentController {
 
     // 댓글 작성: POST /api/posts/1/comments
     @PostMapping
-    public ResponseEntity<Void> create(@PathVariable Long postId, @RequestBody @Valid CommentCreateRequestDto dto) {
-        commentService.createComment(postId, dto);
+    public ResponseEntity<Void> create(@PathVariable Long postId, @RequestBody @Valid CommentCreateRequestDto dto, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        commentService.createComment(postId, dto, userId);
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201
     }
 
