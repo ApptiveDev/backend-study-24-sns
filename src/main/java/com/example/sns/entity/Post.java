@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import com.example.sns.exception.CustomException;
+import com.example.sns.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,21 @@ public class Post {
     }
 
     public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    // 해당 사용자가 작성한 게시글인지 확인 (도메인)
+    public boolean isWrittenBy(User user) {
+        return this.user.getId().equals(user.getId());
+    }
+
+    // 게시글을 수정하며 작성자 검증을 포함한다.
+    public void update(String title, String content, User requester) {
+        if (!isWrittenBy(requester)) {
+            // 권한이 없으면 CustomException을 발생시킨다.
+            throw new CustomException(ErrorCode.NO_PERMISSION);
+        }
         this.title = title;
         this.content = content;
     }
