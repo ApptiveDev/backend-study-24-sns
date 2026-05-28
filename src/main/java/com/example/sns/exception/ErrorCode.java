@@ -1,9 +1,7 @@
-//유저, 게시글 등 분야별 에러 모음집
 package com.example.sns.exception;
 
 import org.springframework.http.HttpStatus;
 
-// Enum을 사용하면 에러들을 분야별로 아주 깔끔하게 모아둘 수 있다.
 public enum ErrorCode {
 
     // USER 분야 에러
@@ -13,7 +11,14 @@ public enum ErrorCode {
 
     // POST 분야 에러
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
-    NO_PERMISSION(HttpStatus.FORBIDDEN, "해당 게시글에 대한 권한이 없습니다."),
+    NO_PERMISSION(HttpStatus.FORBIDDEN, "해당 작업에 대한 권한이 없습니다."),
+
+    // COMMENT 분야 에러
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
+
+    // LIKE 분야 에러
+    ALREADY_LIKED(HttpStatus.BAD_REQUEST, "이미 좋아요를 눌렀습니다."),
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 찾을 수 없습니다."),
 
     // AUTH (인증) 분야 에러
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않거나 만료된 토큰입니다.");

@@ -28,13 +28,12 @@ public class PostLikeService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 이미 좋아요를 누른 상태인지 확인한다.
+        // if문은 그대로, throw 안에 에러코드만 변경
         if (postLikeRepository.existsByUserAndPost(user, post)) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN); // 필요시 ALREADY_LIKED 에러코드 생성 권장
+            throw new CustomException(ErrorCode.ALREADY_LIKED);
         }
 
-        PostLike postLike = new PostLike(user, post);
-        postLikeRepository.save(postLike);
+        postLikeRepository.save(new PostLike(user, post));
     }
 
     @Transactional
@@ -45,7 +44,7 @@ public class PostLikeService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         PostLike postLike = postLikeRepository.findByUserAndPost(user, post)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND)); // 필요시 LIKE_NOT_FOUND 에러코드 생성 권장
+                .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
 
         postLikeRepository.delete(postLike);
     }

@@ -24,20 +24,20 @@ public class CommentController {
             @Valid @RequestBody CommentRequest request) {
 
         Long userId = (Long) httpRequest.getAttribute("userId");
-        CommentResponse response = commentService.createComment(postId, userId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(commentService.createComment(postId, userId, request));
     }
 
     @PatchMapping("/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(
-            @PathVariable Long postId, // 경로 검증용으로 유지
+            @PathVariable Long postId,
             @PathVariable Long commentId,
             HttpServletRequest httpRequest,
             @Valid @RequestBody CommentRequest request) {
 
         Long userId = (Long) httpRequest.getAttribute("userId");
-        CommentResponse response = commentService.updateComment(commentId, userId, request);
-        return ResponseEntity.ok(response);
+        // postId도 같이 넘겨서 Service에서 소속 검증
+        return ResponseEntity.ok(commentService.updateComment(postId, commentId, userId, request));
     }
 
     @DeleteMapping("/{commentId}")
@@ -47,7 +47,8 @@ public class CommentController {
             HttpServletRequest httpRequest) {
 
         Long userId = (Long) httpRequest.getAttribute("userId");
-        commentService.deleteComment(commentId, userId);
+        // postId도 같이 넘겨서 Service에서 소속 검증
+        commentService.deleteComment(postId, commentId, userId);
         return ResponseEntity.noContent().build();
     }
 }

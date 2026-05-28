@@ -9,6 +9,7 @@ import com.example.sns.exception.ErrorCode;
 import com.example.sns.repository.UserRepository;
 import com.example.sns.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +20,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    // 회원가입 비즈니스 로직을 수행한다.
     @Transactional
     public void signUp(UserSignUpRequest request) {
         userRepository.findByEmail(request.email())
@@ -28,16 +29,16 @@ public class UserService {
                     throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
                 });
 
-        User user = new User(request.email(), request.password(), request.name());
+        String encodedPassword = passwordEncoder.encode(request.password());
+        User user = new User(request.email(), encodedPassword, request.name());
         userRepository.save(user);
     }
 
-    // 로그인 검증 및 토큰 발급을 수행한다.
     public UserLoginResponse login(UserLoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (!user.getPassword().equals(request.password())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
@@ -45,7 +46,6 @@ public class UserService {
         return new UserLoginResponse(accessToken);
     }
 
-    // 내부 로직용 유저 조회 기능을 제공한다.
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
