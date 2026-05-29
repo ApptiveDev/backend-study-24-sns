@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNS Home</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+<main class="home-shell">
+    <section class="profile-panel">
+        <div>
+            <p class="eyebrow">인증 성공</p>
+            <h1 th:text="${user.nickname}">nickname</h1>
+            <p class="username" th:text="|@${user.username}|">@username</p>
+        </div>
+
+        <dl class="token-box">
+            <dt>Access Token</dt>
+            <dd th:text="${accessToken}">token</dd>
+        </dl>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="secondary-button">로그아웃</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

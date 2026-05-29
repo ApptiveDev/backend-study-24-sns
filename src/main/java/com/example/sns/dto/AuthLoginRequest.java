@@ -10,4 +10,12 @@ public class AuthLoginRequest {
 
     @NotBlank(message = "username is required.")
     private String username;
+
+    public AuthLoginRequest(String username) {
+        this.username = username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
