@@ -57,6 +57,13 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("REFRESH_TOKEN_EXPIRED", e.getMessage()));
     }
 
+    // 본인 팔로우 불가
+    @ExceptionHandler(SelfFollowException.class)
+    public ResponseEntity<ErrorResponse> handleSelfFollow(SelfFollowException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("SELF_FOLLOW_NOT_ALLOWED", e.getMessage()));
+    }
+
     // 그 외 모든 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception e) {
