@@ -45,4 +45,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleLoginFailedException(LoginFailedException e){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
+
+    @ExceptionHandler(FollowException.class)
+    public ResponseEntity<String> handleFollowException(FollowException e){
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }

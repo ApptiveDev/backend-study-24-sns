@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthInterceptor implements HandlerInterceptor{
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final String ACCESS_TOKEN_COOKIE_NAME = "ACCESS_TOKEN";
 
     private final JwtTokenProvider jwtTokenProvider;
 
