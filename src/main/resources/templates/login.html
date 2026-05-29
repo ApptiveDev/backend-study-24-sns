@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - SNS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            padding: 40px;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 32px;
+            color: #262626;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #fafafa;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #a8a8a8;
+            background: #fff;
+        }
+
+        .error-field {
+            border-color: #ed4956 !important;
+        }
+
+        .field-error {
+            color: #ed4956;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .error-box {
+            background: #fff3f3;
+            border: 1px solid #ed4956;
+            border-radius: 4px;
+            padding: 10px 12px;
+            color: #ed4956;
+            font-size: 13px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 10px;
+            background: #0095f6;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-login:hover { background: #1877f2; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0;
+            color: #8e8e8e;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #dbdbdb;
+        }
+
+        .signup-box {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #262626;
+        }
+
+        .signup-box a {
+            color: #0095f6;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="logo">SNS</div>
+
+    <div class="error-box" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/view/login}" th:object="${loginForm}" method="post">
+
+        <div class="form-group">
+            <input
+                type="email"
+                th:field="*{email}"
+                th:classappend="${#fields.hasErrors('email')} ? 'error-field'"
+                placeholder="이메일"
+                autocomplete="email"
+            />
+            <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+        </div>
+
+        <div class="form-group">
+            <input
+                type="password"
+                th:field="*{password}"
+                th:classappend="${#fields.hasErrors('password')} ? 'error-field'"
+                placeholder="비밀번호"
+                autocomplete="current-password"
+            />
+            <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+        </div>
+
+        <button type="submit" class="btn-login">로그인</button>
+    </form>
+
+    <div class="divider">또는</div>
+
+    <div class="signup-box">
+        계정이 없으신가요? <a th:href="@{/view/register}">가입하기</a>
+    </div>
+</div>
+
+</body>
+</html>
