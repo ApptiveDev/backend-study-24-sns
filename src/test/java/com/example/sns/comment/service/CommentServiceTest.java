@@ -54,7 +54,7 @@ class CommentServiceTest {
         String content = "댓글 내용입니다";
 
         User user = new User("test@test.com", "testuser", "password123");
-        Post post = new Post("게시글 제목", "게시글 내용", user);
+        Post post = Post.createPost("게시글 제목", "게시글 내용", user);
         Comment comment = new Comment(content, user, post);
 
         CommentCreateRequest request = new CommentCreateRequest(userId, content);
@@ -118,7 +118,7 @@ class CommentServiceTest {
         String newContent = "수정된 댓글 내용";
 
         User user = new User("test@test.com", "testuser", "password123");
-        Post post = new Post("게시글 제목", "게시글 내용", user);
+        Post post = Post.createPost("게시글 제목", "게시글 내용", user);
         Comment comment = new Comment("원본 댓글 내용", user, post);
 
         CommentUpdateRequest request = new CommentUpdateRequest(userId, newContent);

@@ -61,7 +61,7 @@ class CommentControllerTest {
         user = new User("test@test.com", "testuser", "password123");
         userRepository.save(user);
 
-        post = new Post("테스트 게시글", "게시글 내용", user);
+        post = Post.createPost("테스트 게시글", "게시글 내용", user);
         postRepository.save(post);
 
         comment = new Comment("원본 댓글", user, post);
