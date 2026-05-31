@@ -8,6 +8,7 @@ import com.example.sns.auth.dto.LoginResponse;
 import com.example.sns.exception.BusinessException;
 import com.example.sns.exception.ErrorCode;
 import com.example.sns.security.util.JwtUtil;
+import com.example.sns.security.util.PasswordEncoder;
 import com.example.sns.user.entity.User;
 import com.example.sns.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,7 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_PASSWORD));
 
-        if(!user.getPassword().equals(request.password())) {
-            // 예외 처리
+        if (!PasswordEncoder.matches(request.password(), user.getPassword())) {
             throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
 

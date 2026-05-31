@@ -1,9 +1,11 @@
 package com.example.sns.user.entity;
 
+import com.example.sns.security.util.PasswordEncoder;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
 @Entity
@@ -25,14 +27,15 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    public User(String email, String name, String password) {
+    private User(String email, String name, String password) {
         this.email = email;
         this.name = name;
         this.password = password;
     }
 
-    // 추후에 도메인 규칙 추가
+
     public static User create(String email, String name, String password) {
-        return new User(email, name, password);
+        String encodedPassword = PasswordEncoder.encode(password);
+        return new User(email, name, encodedPassword);
     }
 }
