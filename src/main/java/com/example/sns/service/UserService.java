@@ -34,6 +34,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public UserLoginResponse login(UserLoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -43,7 +44,33 @@ public class UserService {
         }
 
         String accessToken = jwtProvider.createAccessToken(user.getId());
-        return new UserLoginResponse(accessToken);
+        String refreshToken = jwtProvider.createRefreshToken(user.getId());
+
+        user.updateRefreshToken(refreshToken);
+
+        return new UserLoginResponse(accessToken, refreshToken);
+    }
+
+    @Transactional
+    public UserLoginResponse reissue(String refreshToken) {
+        if (!jwtProvider.validateToken(refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+
+        Long userId = jwtProvider.getUserIdFromToken(refreshToken);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (!refreshToken.equals(user.getRefreshToken())) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+
+        String newAccessToken = jwtProvider.createAccessToken(userId);
+        String newRefreshToken = jwtProvider.createRefreshToken(userId);
+
+        user.updateRefreshToken(newRefreshToken);
+
+        return new UserLoginResponse(newAccessToken, newRefreshToken);
     }
 
     public User findById(Long id) {

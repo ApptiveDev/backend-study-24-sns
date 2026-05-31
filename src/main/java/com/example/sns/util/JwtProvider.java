@@ -2,43 +2,55 @@ package com.example.sns.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
 public class JwtProvider {
 
-    private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-
+    private final Key secretKey;
     private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 60;
+    private final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 14;
 
-    // 1. 로그인 성공 시 Access Token 발급
+    public JwtProvider(@Value("${jwt.secret}") String secret) {
+        byte[] keyBytes = Base64.getEncoder().encode(secret.getBytes());
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
+    }
+
     public String createAccessToken(Long userId) {
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(String.valueOf(userId)) // Payload에 userId 저장
-                .setIssuedAt(now) // 발급 시간
-                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME)) // 만료 시간
-                .signWith(secretKey) // 비밀 키로 서명 (위조 방지)
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME))
+                .signWith(secretKey)
                 .compact();
     }
 
-    // 2. 토큰이 진짜인지(위조/만료) 검증
+    public String createRefreshToken(Long userId) {
+        Date now = new Date();
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
+                .signWith(secretKey)
+                .compact();
+    }
+
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
-            // 만료되었거나 손상된 토큰이면 여기서 false를 반환합니다.
             return false;
         }
     }
 
-    // 3. 토큰을 열어서 안에 들어있는 userId 불러옴
     public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)

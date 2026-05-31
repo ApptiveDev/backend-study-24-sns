@@ -23,35 +23,31 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    // 게시글 생성을 처리한다.
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Post post = new Post(request.title(), request.content(), user);
-        Post savedPost = postRepository.save(post);
-        return PostResponse.from(savedPost);
+        return PostResponse.from(postRepository.save(post));
     }
 
-    // 전체 게시글 조회를 처리한다.
     public List<PostResponse> getPosts() {
         return postRepository.findAllWithUser().stream()
                 .map(PostResponse::from)
                 .collect(Collectors.toList());
     }
 
-    // 단건 게시글 조회를 처리한다.
+    // findByIdWithUser로 N+1 해결
     public PostResponse getPost(Long id) {
-        Post post = postRepository.findById(id)
+        Post post = postRepository.findByIdWithUser(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
         return PostResponse.from(post);
     }
 
-    // 게시글 수정 로직을 엔티티에 위임하여 처리한다.
     @Transactional
     public PostResponse updatePost(Long id, Long userId, PostUpdateRequest request) {
-        Post post = postRepository.findById(id)
+        Post post = postRepository.findByIdWithUser(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         User requester = userRepository.findById(userId)
@@ -61,10 +57,9 @@ public class PostService {
         return PostResponse.from(post);
     }
 
-    // 작성자 권한을 확인하고 게시글을 삭제한다.
     @Transactional
     public void deletePost(Long id, Long userId) {
-        Post post = postRepository.findById(id)
+        Post post = postRepository.findByIdWithUser(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         User requester = userRepository.findById(userId)

@@ -17,17 +17,20 @@ public class UserController {
 
     private final UserService userService;
 
-    // 회원가입을 처리한다.
     @PostMapping("/signup")
     public ResponseEntity<Void> signUp(@Valid @RequestBody UserSignUpRequest request) {
         userService.signUp(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // 로그인을 처리하고 토큰을 반환한다.
     @PostMapping("/login")
     public ResponseEntity<UserLoginResponse> login(@Valid @RequestBody UserLoginRequest request) {
-        UserLoginResponse response = userService.login(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userService.login(request));
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<UserLoginResponse> reissue(@RequestHeader("Authorization") String authHeader) {
+        String refreshToken = authHeader.replace("Bearer ", "");
+        return ResponseEntity.ok(userService.reissue(refreshToken));
     }
 }

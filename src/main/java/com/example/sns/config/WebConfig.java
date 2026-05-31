@@ -20,12 +20,18 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns(
                         "/users/signup",
-                        "/users/login"
+                        "/users/login",
+                        "/users/reissue",   // refreshToken으로 accessToken 재발급
+                        "/h2-console/**",    // H2 콘솔 접근 허용
+                        "/login",        // 추가: 로그인 화면
+                        "/feed"          // 추가: 피드 화면
+
                 );
     }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 }
