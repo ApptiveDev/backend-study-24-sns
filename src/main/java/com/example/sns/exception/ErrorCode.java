@@ -31,6 +31,10 @@ public enum ErrorCode {
     // Like 관련
     ALREADY_LIKED(HttpStatus.CONFLICT, "이미 좋아요를 누른 게시물입니다."),
 
+    // Follow 관련
+    ALREADY_FOLLOWED(HttpStatus.CONFLICT, "이미 팔로우한 사용자입니다."),
+    FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우 관계를 찾을 수 없습니다."),
+
     // Validation
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력값이 올바르지 않습니다.");
 

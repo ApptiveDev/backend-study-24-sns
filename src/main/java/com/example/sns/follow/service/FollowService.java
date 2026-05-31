@@ -30,7 +30,7 @@ public class FollowService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         if(followRepository.existsByFollowerIdAndFollowingId(followerId, followingId)) {
-            throw new IllegalArgumentException("이미 팔로우했습니다.");
+            throw new BusinessException(ErrorCode.ALREADY_FOLLOWED);
         }
 
         Follow follow = Follow.create(follower, following);
@@ -42,8 +42,8 @@ public class FollowService {
     // 언팔로우
     @Transactional
     public void unfollow(Long followerId, Long followingId) {
-        Follow follow = followRepository.findByFollowerIdAndFollowingId(followerId, followingId).orElseThrow(
-                () -> new IllegalArgumentException("팔로우 관계가 없습니다."));
+        Follow follow = followRepository.findByFollowerIdAndFollowingId(followerId, followingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.FOLLOW_NOT_FOUND));
         followRepository.delete(follow);  // Follow 엔티티 삭제
     }
 
