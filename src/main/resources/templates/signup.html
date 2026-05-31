@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>SNS 로그인</title>
+    <title>SNS 회원가입</title>
     <style>
         body {
             display: flex;
@@ -13,7 +13,7 @@
             background-color: #fafafa;
             font-family: Arial, sans-serif;
         }
-        .login-box {
+        .signup-box {
             background: white;
             padding: 40px;
             border: 1px solid #dbdbdb;
@@ -43,21 +43,22 @@
         }
         button:hover { background-color: #0081d6; }
         .error { color: red; font-size: 13px; margin-bottom: 12px; }
-        .signup-link { margin-top: 16px; font-size: 13px; color: #555; }
-        .signup-link a { color: #0095f6; text-decoration: none; }
+        .login-link { margin-top: 16px; font-size: 13px; color: #555; }
+        .login-link a { color: #0095f6; text-decoration: none; }
     </style>
 </head>
 <body>
-<div class="login-box">
+<div class="signup-box">
     <h1>SNS</h1>
     <p class="error" th:if="${error}" th:text="${error}"></p>
-    <form method="post" action="/login">
+    <form method="post" action="/signup">
         <input type="email" name="email" placeholder="이메일" required />
-        <input type="password" name="password" placeholder="비밀번호" required />
-        <button type="submit">로그인</button>
+        <input type="password" name="password" placeholder="비밀번호 (8자 이상, 영문+숫자)" required />
+        <input type="text" name="name" placeholder="이름" required />
+        <button type="submit">회원가입</button>
     </form>
-    <div class="signup-link">
-        계정이 없으신가요? <a href="/signup">회원가입</a>
+    <div class="login-link">
+        이미 계정이 있으신가요? <a href="/login">로그인</a>
     </div>
 </div>
 </body>

@@ -23,7 +23,29 @@
       text-align: center;
       color: #262626;
       font-size: 18px;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .section {
+      background: white;
+      border: 1px solid #dbdbdb;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto 20px auto;
+    }
+    .section-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: #262626;
+    }
+    .user-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #fafafa;
+      font-size: 14px;
     }
     .token-box {
       background: white;
@@ -31,7 +53,7 @@
       border-radius: 8px;
       padding: 16px;
       max-width: 500px;
-      margin: 0 auto;
+      margin: 0 auto 20px auto;
       word-break: break-all;
       font-size: 13px;
       color: #555;
@@ -41,20 +63,49 @@
       margin-bottom: 8px;
       color: #262626;
     }
+    .empty { color: #999; font-size: 13px; }
   </style>
 </head>
 <body>
 <div class="header">SNS</div>
 
 <p class="welcome">
-  <!-- 로그인한 이메일 표시 -->
   <span th:text="${email}"></span>님 환영합니다! 🎉
 </p>
 
+<!-- Access Token -->
 <div class="token-box">
   <div class="token-label">발급된 Access Token</div>
-  <!-- 발급된 토큰 표시 -->
   <div th:text="${accessToken}"></div>
 </div>
+
+<!-- 팔로잉 목록 (내가 팔로우하는 사람들) -->
+<div class="section">
+  <div class="section-title">내가 팔로우하는 사람들
+    (<span th:text="${#lists.size(followings)}"></span>명)
+  </div>
+  <div th:if="${#lists.isEmpty(followings)}" class="empty">
+    아직 팔로우하는 사람이 없습니다.
+  </div>
+  <div th:each="follow : ${followings}" class="user-item">
+    <span th:text="${follow.name}"></span>
+    <span th:text="${follow.email}" style="color:#999; font-size:12px;"></span>
+  </div>
+</div>
+
+<!-- 팔로워 목록 (나를 팔로우하는 사람들) -->
+<div class="section">
+  <div class="section-title">나를 팔로우하는 사람들
+    (<span th:text="${#lists.size(followers)}"></span>명)
+  </div>
+  <div th:if="${#lists.isEmpty(followers)}" class="empty">
+    아직 팔로워가 없습니다.
+  </div>
+  <div th:each="follow : ${followers}" class="user-item">
+    <span th:text="${follow.name}"></span>
+    <span th:text="${follow.email}" style="color:#999; font-size:12px;"></span>
+  </div>
+</div>
+
 </body>
 </html>
