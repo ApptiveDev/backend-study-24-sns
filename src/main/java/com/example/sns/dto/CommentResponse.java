@@ -1,0 +1,27 @@
+package com.example.sns.dto;
+
+import com.example.sns.entity.Comment;
+
+import java.time.LocalDateTime;
+
+public record CommentResponse(
+        Long commentId,
+        Long postId,
+        Long writerId,
+        String writerNickname,
+        String content,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {
+    public static CommentResponse from(Comment comment) {
+        return new CommentResponse(
+                comment.getId(),
+                comment.getPost().getId(),
+                comment.getUser().getId(),
+                comment.getUser().getNickname(),
+                comment.getContent(),
+                comment.getCreatedAt(),
+                comment.getUpdatedAt()
+        );
+    }
+}
