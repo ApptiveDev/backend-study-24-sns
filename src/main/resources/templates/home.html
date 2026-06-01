@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>홈</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f6fa;
+        }
+
+        .home-container {
+            width: 500px;
+            margin: 120px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="home-container">
+    <h2>로그인 성공</h2>
+
+    <p th:text="${message}"></p>
+
+    <p>
+        <strong>사용자 이메일:</strong>
+        <span th:text="${email}"></span>
+    </p>
+
+    <a href="/login">로그인 화면으로 돌아가기</a>
+</div>
+
+</body>
+</html>
