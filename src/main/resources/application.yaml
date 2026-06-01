@@ -23,5 +23,5 @@ spring:
         format_sql: true
 
 jwt:
-  secret-key: my-super-secret-key-for-jwt-authentication-123456
+  secret-key: ${JWT_SECRET_KEY}
   access-token-expire-time: 3600000
