@@ -20,10 +20,14 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
+                        "/login",
                         "/users",
                         "/auth/login",
                         "/auth/reissue",
-                        "/h2-console/**"
+                        "/h2-console/**",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**"
                 );
     }
 }

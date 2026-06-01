@@ -2,6 +2,7 @@ package com.example.sns.auth;
 
 import com.example.sns.exception.CustomException;
 import com.example.sns.exception.ErrorCode;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -23,32 +24,51 @@ public class AuthInterceptor implements HandlerInterceptor {
             HttpServletResponse response,
             Object handler
     ) {
-        String authorizationHeader = request.getHeader("Authorization");
+        String token = resolveToken(request);
 
-        // Authorization 헤더가 없는 경우
-        if (authorizationHeader == null || authorizationHeader.isBlank()) {
+        // 토큰이 없는 경우
+        if (token == null || token.isBlank()) {
             throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);
         }
-
-        // Bearer 형식이 아닌 경우
-        if (!authorizationHeader.startsWith("Bearer ")) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
-        }
-
-        // "Bearer " 뒤의 실제 토큰 값만 추출
-        String token = authorizationHeader.substring(7);
 
         // 토큰이 유효하지 않은 경우
         if (!jwtUtil.validateToken(token)) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
-        // 토큰에서 userId 추출
+        // 토큰에서 userId, email 추출
         Long userId = jwtUtil.getUserId(token);
+        String email = jwtUtil.getEmail(token);
 
         // 이후 컨트롤러에서 사용할 수 있도록 request에 저장
         request.setAttribute("userId", userId);
+        request.setAttribute("email", email);
 
         return true;
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        // 1. Postman/API 요청: Authorization 헤더에서 토큰 추출
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+
+        // Authorization 헤더가 있는데 Bearer 형식이 아닌 경우
+        if (authorizationHeader != null && !authorizationHeader.isBlank()) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+
+        // 2. 브라우저/Thymeleaf 요청: 쿠키에서 토큰 추출
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 }
