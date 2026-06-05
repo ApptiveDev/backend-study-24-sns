@@ -25,24 +25,25 @@ public class CommentService {
 
     @Transactional
     public CommentResponse createComment(Long postId, Long userId, CommentRequest request) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findByIdWithUser(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Comment comment = new Comment(request.content(), user, post);
-        return CommentResponse.from(commentRepository.save(comment));
+        Comment savedComment = commentRepository.save(comment);
+
+        return CommentResponse.from(
+                commentRepository.findByIdAndPostId(savedComment.getId(), postId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND))
+        );
     }
 
     @Transactional
     public CommentResponse updateComment(Long postId, Long commentId, Long userId, CommentRequest request) {
-        Comment comment = commentRepository.findById(commentId)
+        // postId + commentId로 조회 → 소속 검증이 자동으로 됨
+        Comment comment = commentRepository.findByIdAndPostId(commentId, postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
-
-        // 이 댓글이 해당 게시글 소속인지 검증
-        if (!comment.getPost().getId().equals(postId)) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
-        }
 
         User requester = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -53,13 +54,9 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(Long postId, Long commentId, Long userId) {
-        Comment comment = commentRepository.findById(commentId)
+        // postId + commentId로 조회 → 소속 검증이 자동으로 됨
+        Comment comment = commentRepository.findByIdAndPostId(commentId, postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
-
-        // 이 댓글이 해당 게시글 소속인지 검증
-        if (!comment.getPost().getId().equals(postId)) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
-        }
 
         User requester = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

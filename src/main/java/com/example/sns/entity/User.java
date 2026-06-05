@@ -19,6 +19,8 @@ public class User {
     private Long id;
 
     private String name;
+
+    @Column(unique = true) // 추가
     private String email;
     private String password;
     private String refreshToken; // 추가
