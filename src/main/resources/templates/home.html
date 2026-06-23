@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNS 홈</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f7fb;
+            min-height: 100vh;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 30px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 25px;
+            background: #f5f5f5;
+            transition: all 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            background: white;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .user-email {
+            color: #666;
+            font-size: 14px;
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        /* 메인 레이아웃 */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            gap: 25px;
+        }
+
+        /* 왼쪽 사이드바 */
+        .left-sidebar {
+            position: sticky;
+            top: 90px;
+            height: fit-content;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            margin: 0 auto 15px;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .profile-email {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .menu-list {
+            background: white;
+            border-radius: 16px;
+            padding: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+        }
+
+        .menu-item {
+            padding: 12px 25px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item:hover {
+            background: #f5f5f5;
+            color: #667eea;
+        }
+
+        /* 중앙 메인 피드 */
+        .main-feed {
+            min-height: 500px;
+        }
+
+        .post-composer {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .composer-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .composer-input {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .composer-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .composer-textarea {
+            flex: 1;
+        }
+
+        .composer-textarea textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .composer-textarea textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .composer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .composer-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .option-btn {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .post-btn {
+            padding: 10px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 포스트 카드 */
+        .post-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .post-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .post-user-info {
+            flex: 1;
+        }
+
+        .post-username {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .post-time {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .post-content {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #e0e0e0;
+        }
+
+        /* 오른쪽 사이드바 */
+        .right-sidebar {
+            position: sticky;
+            top: 90px;
+            height: fit-content;
+        }
+
+        .widget {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .widget-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .suggest-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .suggest-user:hover {
+            background: #f5f5f5;
+        }
+
+        .suggest-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .suggest-info {
+            flex: 1;
+        }
+
+        .suggest-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .suggest-desc {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .follow-btn {
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .follow-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .left-sidebar,
+            .right-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">✨ SNS</div>
+            <div class="search-bar">
+                <input type="text" placeholder="검색...">
+            </div>
+            <div class="header-actions">
+                <span class="user-email" th:text="${email}">user@email.com</span>
+                <a href="/logout" class="header-btn btn-secondary">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <!-- 왼쪽 사이드바 -->
+        <aside class="left-sidebar">
+            <div class="profile-card">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-name">사용자</div>
+                <div class="profile-email" th:text="${email}">user@email.com</div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">팔로워</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">팔로잉</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">게시물</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-list">
+                <div class="menu-item">🏠 홈</div>
+                <div class="menu-item">🔍 탐색</div>
+                <div class="menu-item">💬 메시지</div>
+                <div class="menu-item">🔔 알림</div>
+                <div class="menu-item">👤 프로필</div>
+                <div class="menu-item">⚙️ 설정</div>
+            </div>
+        </aside>
+
+        <!-- 중앙 메인 피드 -->
+        <main class="main-feed">
+            <!-- 포스트 작성 -->
+            <div class="post-composer">
+                <div class="composer-header">새 게시물 작성</div>
+                <div class="composer-input">
+                    <div class="composer-avatar">👤</div>
+                    <div class="composer-textarea">
+                        <textarea placeholder="무슨 생각을 하고 계신가요?"></textarea>
+                    </div>
+                </div>
+                <div class="composer-actions">
+                    <div class="composer-options">
+                        <button class="option-btn">📷 사진</button>
+                        <button class="option-btn">🎥 동영상</button>
+                        <button class="option-btn">😊 이모지</button>
+                    </div>
+                    <button class="post-btn">게시하기</button>
+                </div>
+            </div>
+
+            <!-- 포스트 피드 -->
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="post-avatar">👤</div>
+                    <div class="post-user-info">
+                        <div class="post-username">데모 사용자</div>
+                        <div class="post-time">5분 전</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    안녕하세요! SNS 플랫폼에 오신 것을 환영합니다. 이곳에서 친구들과 소통하고 일상을 공유해보세요! 🎉
+                </div>
+                <div class="post-actions">
+                    <button class="action-btn">👍 좋아요</button>
+                    <button class="action-btn">💬 댓글</button>
+                    <button class="action-btn">🔄 공유</button>
+                </div>
+            </div>
+
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="post-avatar">🌟</div>
+                    <div class="post-user-info">
+                        <div class="post-username">SNS 공식</div>
+                        <div class="post-time">1시간 전</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    깔끔하고 고급진 디자인의 SNS 플랫폼이 완성되었습니다!
+                    새로운 소셜 경험을 즐겨보세요. ✨
+                </div>
+                <div class="post-actions">
+                    <button class="action-btn">👍 좋아요</button>
+                    <button class="action-btn">💬 댓글</button>
+                    <button class="action-btn">🔄 공유</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 오른쪽 사이드바 -->
+        <aside class="right-sidebar">
+            <div class="widget">
+                <div class="widget-title">추천 팔로우</div>
+                <div class="suggest-user">
+                    <div class="suggest-avatar">🎨</div>
+                    <div class="suggest-info">
+                        <div class="suggest-name">디자이너</div>
+                        <div class="suggest-desc">크리에이티브 디자이너</div>
+                    </div>
+                    <button class="follow-btn">팔로우</button>
+                </div>
+                <div class="suggest-user">
+                    <div class="suggest-avatar">💻</div>
+                    <div class="suggest-info">
+                        <div class="suggest-name">개발자</div>
+                        <div class="suggest-desc">풀스택 개발자</div>
+                    </div>
+                    <button class="follow-btn">팔로우</button>
+                </div>
+                <div class="suggest-user">
+                    <div class="suggest-avatar">📸</div>
+                    <div class="suggest-info">
+                        <div class="suggest-name">사진작가</div>
+                        <div class="suggest-desc">여행 사진작가</div>
+                    </div>
+                    <button class="follow-btn">팔로우</button>
+                </div>
+            </div>
+
+            <div class="widget">
+                <div class="widget-title">트렌드</div>
+                <div class="menu-item">#SNS</div>
+                <div class="menu-item">#소셜네트워크</div>
+                <div class="menu-item">#일상공유</div>
+                <div class="menu-item">#친구만들기</div>
+            </div>
+        </aside>
+    </div>
+</body>
+</html>
