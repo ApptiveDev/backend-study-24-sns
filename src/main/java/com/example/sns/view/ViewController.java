@@ -1,6 +1,7 @@
 package com.example.sns.view;
 
 import com.example.sns.exception.BusinessException;
+import com.example.sns.security.util.PasswordEncoder;
 import com.example.sns.user.entity.User;
 import com.example.sns.user.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -42,8 +43,8 @@ public class ViewController {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new BusinessException(null));
 
-            // 비밀번호 확인
-            if (!user.getPassword().equals(password)) {
+            // 비밀번호 확인 (암호화된 비밀번호와 비교)
+            if (!PasswordEncoder.matches(password, user.getPassword())) {
                 throw new BusinessException(null);
             }
 
@@ -91,5 +92,53 @@ public class ViewController {
     public String logout(HttpSession session) {
         session.invalidate();  // Session 전체 삭제
         return "redirect:/login";
+    }
+
+    /**
+     * 5단계: 회원가입 화면 보여주기
+     * GET /signup 요청 → "signup" 문자열 반환 → templates/signup.html 렌더링
+     */
+    @GetMapping("/signup")
+    public String signupPage() {
+        return "signup";  // templates/signup.html로 이동
+    }
+
+    /**
+     * 6단계: 회원가입 처리
+     * POST /signup 요청 → 사용자 생성 → 로그인 화면으로 리다이렉트
+     */
+    @PostMapping("/signup")
+    public String signup(
+            @RequestParam String name,
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String passwordConfirm,
+            Model model
+    ) {
+        try {
+            // 비밀번호 확인
+            if (!password.equals(passwordConfirm)) {
+                model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
+                return "signup";
+            }
+
+            // 이메일 중복 체크
+            if (userRepository.findByEmail(email).isPresent()) {
+                model.addAttribute("error", "이미 가입된 이메일입니다.");
+                return "signup";
+            }
+
+            // 사용자 생성 (비밀번호 자동 암호화)
+            User user = User.create(email, name, password);
+            userRepository.save(user);
+
+            // 회원가입 성공 후 로그인 페이지로 리다이렉트
+            model.addAttribute("success", "회원가입이 완료되었습니다. 로그인해주세요.");
+            return "login";
+
+        } catch (Exception e) {
+            model.addAttribute("error", "회원가입 중 오류가 발생했습니다.");
+            return "signup";
+        }
     }
 }

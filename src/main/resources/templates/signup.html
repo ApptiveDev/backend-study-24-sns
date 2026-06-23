@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인</title>
+    <title>회원가입</title>
     <style>
         * {
             margin: 0;
@@ -18,22 +18,30 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
-        .login-container {
+        .signup-container {
             background: white;
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
         }
 
         h1 {
             color: #333;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             text-align: center;
             font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
         }
 
         .form-group {
@@ -45,22 +53,26 @@
             margin-bottom: 8px;
             color: #555;
             font-weight: 500;
+            font-size: 14px;
         }
 
         input[type="email"],
+        input[type="text"],
         input[type="password"] {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
 
         input[type="email"]:focus,
+        input[type="text"]:focus,
         input[type="password"]:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .error-message {
@@ -70,6 +82,17 @@
             border-radius: 8px;
             margin-bottom: 20px;
             font-size: 14px;
+            border-left: 4px solid #c33;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #2a2;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border-left: 4px solid #2a2;
         }
 
         button {
@@ -82,25 +105,16 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
 
         button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
         button:active {
             transform: translateY(0);
-        }
-
-        .success-message {
-            background: #efe;
-            color: #2a2;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            border-left: 4px solid #2a2;
         }
 
         .divider {
@@ -127,40 +141,58 @@
             position: relative;
         }
 
-        .signup-link {
+        .login-link {
             text-align: center;
             margin-top: 20px;
         }
 
-        .signup-link a {
+        .login-link a {
             color: #667eea;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.2s;
         }
 
-        .signup-link a:hover {
+        .login-link a:hover {
             color: #764ba2;
             text-decoration: underline;
+        }
+
+        .password-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>🔐 SNS 로그인</h1>
+    <div class="signup-container">
+        <h1>✨ 회원가입</h1>
+        <p class="subtitle">SNS 계정을 만들고 친구들과 소통하세요</p>
+
+        <!-- 에러 메시지 표시 -->
+        <div th:if="${error}" class="error-message">
+            <span th:text="${error}">회원가입 실패</span>
+        </div>
 
         <!-- 성공 메시지 표시 -->
         <div th:if="${success}" class="success-message">
             <span th:text="${success}">회원가입 성공</span>
         </div>
 
-        <!-- 에러 메시지 표시 -->
-        <div th:if="${error}" class="error-message">
-            <span th:text="${error}">로그인 실패</span>
-        </div>
+        <!-- 회원가입 폼 -->
+        <form method="post" th:action="@{/signup}">
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text"
+                       id="name"
+                       name="name"
+                       placeholder="홍길동"
+                       required
+                       minlength="2"
+                       maxlength="20">
+            </div>
 
-        <!-- 로그인 폼 -->
-        <form method="post" th:action="@{/login}">
             <div class="form-group">
                 <label for="email">이메일</label>
                 <input type="email"
@@ -175,19 +207,31 @@
                 <input type="password"
                        id="password"
                        name="password"
-                       placeholder="비밀번호를 입력하세요"
-                       required>
+                       placeholder="8자 이상 입력하세요"
+                       required
+                       minlength="8">
+                <p class="password-hint">영문, 숫자 포함 8자 이상</p>
             </div>
 
-            <button type="submit">로그인</button>
+            <div class="form-group">
+                <label for="passwordConfirm">비밀번호 확인</label>
+                <input type="password"
+                       id="passwordConfirm"
+                       name="passwordConfirm"
+                       placeholder="비밀번호를 다시 입력하세요"
+                       required
+                       minlength="8">
+            </div>
+
+            <button type="submit">가입하기</button>
         </form>
 
         <div class="divider">
             <span>OR</span>
         </div>
 
-        <div class="signup-link">
-            계정이 없으신가요? <a href="/signup">회원가입</a>
+        <div class="login-link">
+            이미 계정이 있으신가요? <a href="/login">로그인</a>
         </div>
     </div>
 </body>
