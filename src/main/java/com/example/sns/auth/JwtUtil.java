@@ -3,7 +3,7 @@ package com.example.sns.auth;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -13,29 +13,18 @@ import java.util.Date;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
 
-    private final SecretKey secretKey;
-    private final long expiration;
-    private final long refreshExpiration;
-
-    public JwtUtil(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long expiration,
-            @Value("${jwt.refresh-expiration}") long refreshExpiration
-    ) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expiration = expiration;
-        this.refreshExpiration = refreshExpiration;
-    }
+    private final JwtProperties jwtProperties;
 
     // Access Token 생성
     public String generateAccessToken(Long userId) {
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(secretKey)
+                .expiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration()))
+                .signWith(getSecretKey())
                 .compact();
     }
 
@@ -46,13 +35,13 @@ public class JwtUtil {
 
     // Refresh Token 만료시간 계산
     public LocalDateTime getRefreshTokenExpiresAt() {
-        return LocalDateTime.now().plusDays(refreshExpiration);
+        return LocalDateTime.now().plusDays(jwtProperties.getRefreshExpiration());
     }
 
     // 토큰에서 userId 추출
     public Long getUserId(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(secretKey)
+                .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -63,12 +52,17 @@ public class JwtUtil {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(secretKey)
+                    .verifyWith(getSecretKey())
                     .build()
                     .parseSignedClaims(token);
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    // SecretKey를 매번 생성하지 않으려면 @PostConstruct로 캐싱도 가능
+    private SecretKey getSecretKey() {
+        return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     }
 }
