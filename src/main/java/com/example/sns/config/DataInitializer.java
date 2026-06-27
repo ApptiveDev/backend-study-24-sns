@@ -1,8 +1,6 @@
 package com.example.sns.config;
 
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,12 +15,11 @@ import com.example.sns.repository.PostRepository;
 import com.example.sns.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataInitializer {
-    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
-
     
     private final UserRepository userRepository;
     private final PostRepository postRepository;
