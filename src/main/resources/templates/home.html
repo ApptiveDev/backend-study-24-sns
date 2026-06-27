@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SNS 홈</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 720px;
+            margin: 80px auto;
+            padding: 32px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .profile {
+            padding: 20px;
+            background: #eff6ff;
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+
+        .profile p {
+            margin: 8px 0;
+        }
+
+        .counts {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .count-box {
+            flex: 1;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .count-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .follow-box {
+            margin-top: 24px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+        }
+
+        input {
+            padding: 10px;
+            width: 180px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 10px 14px;
+            margin-left: 8px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .logout-button {
+            margin-top: 24px;
+            background: #dc2626;
+        }
+
+        .logout-button:hover {
+            background: #b91c1c;
+        }
+
+        .message {
+            margin-top: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>로그인 성공!</h1>
+
+    <div class="profile">
+        <p>
+            <strong>사용자 ID:</strong>
+            <span th:text="${loginUser.id}">1</span>
+        </p>
+        <p>
+            <strong>사용자 이름:</strong>
+            <span th:text="${loginUser.username}">user1</span>
+        </p>
+        <p>
+            <strong>이메일:</strong>
+            <span th:text="${loginUser.email}">user1@test.com</span>
+        </p>
+
+        <div class="counts">
+            <div class="count-box">
+                <div>팔로워</div>
+                <div class="count-number" th:text="${followerCount}">0</div>
+            </div>
+
+            <div class="count-box">
+                <div>팔로잉</div>
+                <div class="count-number" th:text="${followingCount}">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="follow-box">
+        <h2>팔로우 테스트</h2>
+        <p>팔로우할 사용자 ID를 입력하세요. 예: 2</p>
+
+        <input id="targetUserId" type="number" placeholder="사용자 ID">
+
+        <button type="button" onclick="followUser()">팔로우</button>
+        <button type="button" onclick="unfollowUser()">팔로우 취소</button>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <form method="post" action="/logout">
+        <button class="logout-button" type="submit">로그아웃</button>
+    </form>
+</div>
+
+<script>
+    async function followUser() {
+        const targetUserId = document.getElementById("targetUserId").value;
+
+        if (!targetUserId) {
+            alert("사용자 ID를 입력하세요.");
+            return;
+        }
+
+        const response = await fetch(`/users/${targetUserId}/follow`, {
+            method: "POST"
+        });
+
+        const text = await response.text();
+        document.getElementById("message").innerText = text;
+
+        if (response.ok) {
+            location.reload();
+        }
+    }
+
+    async function unfollowUser() {
+        const targetUserId = document.getElementById("targetUserId").value;
+
+        if (!targetUserId) {
+            alert("사용자 ID를 입력하세요.");
+            return;
+        }
+
+        const response = await fetch(`/users/${targetUserId}/follow`, {
+            method: "DELETE"
+        });
+
+        const text = await response.text();
+        document.getElementById("message").innerText = text;
+
+        if (response.ok) {
+            location.reload();
+        }
+    }
+</script>
+</body>
+</html>

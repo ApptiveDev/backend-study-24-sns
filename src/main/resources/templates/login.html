@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SNS 로그인</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 360px;
+            margin: 120px auto;
+            padding: 32px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-top: 16px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .error {
+            margin-top: 16px;
+            padding: 10px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .hint {
+            margin-top: 16px;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>SNS 로그인</h1>
+
+    <form method="post" action="/login">
+        <label for="username">사용자 이름</label>
+        <input id="username" name="username" type="text" placeholder="user1" required>
+
+        <label for="password">비밀번호</label>
+        <input id="password" name="password" type="password" placeholder="1234" required>
+
+        <button type="submit">로그인</button>
+    </form>
+
+    <div class="error" th:if="${error}" th:text="${error}">
+        로그인 실패 메시지
+    </div>
+
+    <div class="hint">
+        테스트 계정: user1 / 1234
+    </div>
+</div>
+</body>
+</html>
