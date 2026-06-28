@@ -3,7 +3,7 @@ package com.example.sns.dto;
 import java.time.LocalDateTime;
 
 public record CommentResponseDto(
-        Long id,
+        Long commentId,
         String content,
         String username,
         LocalDateTime createdAt,
