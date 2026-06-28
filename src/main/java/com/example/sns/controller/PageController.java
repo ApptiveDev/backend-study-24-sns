@@ -7,9 +7,11 @@ import com.example.sns.dto.UserSignUpRequest;
 import com.example.sns.entity.User;
 import com.example.sns.service.FollowService;
 import com.example.sns.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,13 +65,17 @@ public class PageController {
     // 회원가입 처리
     @PostMapping("/signup")
     public String signup(
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String name,
+            @Valid UserSignUpRequest request,
+            BindingResult bindingResult,
             Model model) {
 
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("error", bindingResult.getFieldError().getDefaultMessage());
+            return "signup";
+        }
+
         try {
-            userService.signUp(new UserSignUpRequest(email, password, name));
+            userService.signUp(request);
             return "redirect:/login"; // 성공 시 로그인 화면으로
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
