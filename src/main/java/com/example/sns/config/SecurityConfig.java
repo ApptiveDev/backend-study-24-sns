@@ -1,6 +1,7 @@
 package com.example.sns.config;
 
 import com.example.sns.auth.JwtFilter;
+import com.example.sns.exception.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -35,6 +37,9 @@ public class SecurityConfig {
                                 "/view/register"
                         ).permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
                 )
                 .headers(headers ->
                         headers.frameOptions(frame -> frame.disable())) // H2 콘솔용

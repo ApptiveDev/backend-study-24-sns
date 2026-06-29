@@ -1,7 +1,12 @@
 package com.example.sns.exception;
 
+import lombok.Getter;
+
+@Getter
 public class SelfFollowException extends RuntimeException {
+    private final ErrorCode errorCode = ErrorCode.SELF_FOLLOW_NOT_ALLOWED;
+
     public SelfFollowException() {
-        super("자기 자신을 팔로우할 수 없습니다.");
+        super(ErrorCode.SELF_FOLLOW_NOT_ALLOWED.getMessage());
     }
 }

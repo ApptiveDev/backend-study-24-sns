@@ -1,7 +1,12 @@
 package com.example.sns.exception;
 
+import lombok.Getter;
+
+@Getter
 public class RefreshTokenExpiredException extends RuntimeException {
+    private final ErrorCode errorCode = ErrorCode.REFRESH_TOKEN_EXPIRED;
+
     public RefreshTokenExpiredException() {
-        super("만료된 Refresh Token입니다. 다시 로그인해주세요.");
+        super(ErrorCode.REFRESH_TOKEN_EXPIRED.getMessage());
     }
 }

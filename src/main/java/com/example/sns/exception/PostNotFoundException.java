@@ -1,7 +1,12 @@
 package com.example.sns.exception;
 
+import lombok.Getter;
+
+@Getter
 public class PostNotFoundException extends RuntimeException {
+    private final ErrorCode errorCode = ErrorCode.POST_NOT_FOUND;
+
     public PostNotFoundException(Long postId) {
-        super("해당 게시글을 찾을 수 없습니다. postId=" + postId);
+        super(ErrorCode.POST_NOT_FOUND.getMessage() + " postId=" + postId);
     }
 }

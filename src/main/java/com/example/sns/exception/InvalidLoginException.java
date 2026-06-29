@@ -1,7 +1,12 @@
 package com.example.sns.exception;
 
+import lombok.Getter;
+
+@Getter
 public class InvalidLoginException extends RuntimeException {
+    private final ErrorCode errorCode = ErrorCode.INVALID_LOGIN;
+
     public InvalidLoginException() {
-        super("이메일 또는 비밀번호가 올바르지 않습니다.");
+        super(ErrorCode.INVALID_LOGIN.getMessage());
     }
 }
