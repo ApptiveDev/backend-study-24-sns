@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SNS 회원가입</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #fafafa;
+            font-family: Arial, sans-serif;
+        }
+        .signup-box {
+            background: white;
+            padding: 40px;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            width: 350px;
+            text-align: center;
+        }
+        h1 { font-size: 28px; margin-bottom: 24px; color: #262626; }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #0081d6; }
+        .error { color: red; font-size: 13px; margin-bottom: 12px; }
+        .login-link { margin-top: 16px; font-size: 13px; color: #555; }
+        .login-link a { color: #0095f6; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="signup-box">
+    <h1>SNS</h1>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <form method="post" action="/signup">
+        <input type="email" name="email" placeholder="이메일" required />
+        <input type="password" name="password" placeholder="비밀번호 (8자 이상, 영문+숫자)" required />
+        <input type="text" name="name" placeholder="이름" required />
+        <button type="submit">회원가입</button>
+    </form>
+    <div class="login-link">
+        이미 계정이 있으신가요? <a href="/login">로그인</a>
+    </div>
+</div>
+</body>
+</html>

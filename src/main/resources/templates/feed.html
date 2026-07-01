@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>SNS 피드</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background-color: #fafafa;
+      font-family: Arial, sans-serif;
+      color: #262626;
+    }
+    .topbar {
+      background: white;
+      border-bottom: 1px solid #dbdbdb;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .topbar h1 { font-size: 22px; margin: 0; }
+    .topbar .user-email { font-size: 13px; color: #8e8e8e; }
+    .layout {
+      max-width: 935px;
+      margin: 24px auto;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      padding: 0 16px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #dbdbdb;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .post-form { padding: 16px; }
+    .post-form input, .post-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #dbdbdb;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+    }
+    .btn {
+      padding: 8px 16px;
+      background-color: #0095f6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn:hover { background-color: #0081d6; }
+    .btn:disabled { background-color: #b2dffc; cursor: not-allowed; }
+    .btn-text {
+      background: none;
+      border: none;
+      color: #0095f6;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+    }
+    .btn-text.danger { color: #ed4956; }
+    .btn-like {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+    }
+    .post { padding: 16px; }
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .post-author { font-weight: 600; font-size: 14px; }
+    .post-title { font-size: 16px; font-weight: 700; margin: 4px 0; }
+    .post-content { font-size: 14px; line-height: 1.5; color: #262626; white-space: pre-wrap; }
+    .post-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #efefef;
+    }
+    .post-edit-area { display: none; margin-top: 8px; }
+    .post-edit-area.active { display: block; }
+    .comments { margin-top: 10px; padding-top: 10px; border-top: 1px solid #efefef; }
+    .comment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .comment-item b { margin-right: 6px; }
+    .comment-edit-area { display: none; margin-top: 4px; }
+    .comment-edit-area.active { display: block; }
+    .comment-form { display: flex; gap: 8px; margin-top: 8px; }
+    .comment-form input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #dbdbdb;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .sidebar-section { padding: 16px; }
+    .sidebar-section h3 { font-size: 14px; margin: 0 0 12px; color: #262626; }
+    .sidebar-section .empty { font-size: 13px; color: #8e8e8e; }
+    .follow-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .follow-form { display: flex; gap: 6px; margin-top: 10px; }
+    .follow-form input {
+      flex: 1;
+      padding: 6px 8px;
+      border: 1px solid #dbdbdb;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .token-box {
+      font-size: 11px;
+      word-break: break-all;
+      color: #8e8e8e;
+      background: #fafafa;
+      padding: 8px;
+      border-radius: 4px;
+      max-height: 60px;
+      overflow-y: auto;
+    }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #262626;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+    .empty-feed { padding: 40px 16px; text-align: center; color: #8e8e8e; font-size: 14px; }
+    @media (max-width: 700px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>SNS</h1>
+  <div class="user-email" th:text="${email} + ' 님'"></div>
+</div>
+
+<div class="layout">
+  <div>
+    <div class="card post-form">
+      <input id="post-title-input" type="text" placeholder="제목" />
+      <textarea id="post-content-input" rows="3" placeholder="무슨 생각을 하고 있나요?"></textarea>
+      <button class="btn" onclick="createPost()">게시하기</button>
+    </div>
+
+    <div id="post-list"></div>
+  </div>
+
+  <div>
+    <div class="card sidebar-section">
+      <h3>발급된 Access Token</h3>
+      <div class="token-box" th:text="${accessToken}"></div>
+    </div>
+
+    <div class="card sidebar-section">
+      <h3>팔로우 / 언팔로우</h3>
+      <div class="follow-form">
+        <input id="follow-target-id" type="number" placeholder="상대방 userId" />
+        <button class="btn" style="padding: 6px 12px;" onclick="followUser()">팔로우</button>
+      </div>
+    </div>
+
+    <div class="card sidebar-section">
+      <h3 th:text="'내가 팔로우하는 사람들 (' + ${#lists.size(followings)} + '명)'"></h3>
+      <div th:if="${#lists.isEmpty(followings)}" class="empty">아직 팔로우하는 사람이 없습니다.</div>
+      <div th:each="f : ${followings}" class="follow-item">
+        <span th:text="${f.name} + ' (' + ${f.email} + ')'"></span>
+        <button class="btn-text danger" th:attr="data-userid=${f.userId}" onclick="unfollowUser(this.dataset.userid)">언팔로우</button>
+      </div>
+    </div>
+
+    <div class="card sidebar-section">
+      <h3 th:text="'나를 팔로우하는 사람들 (' + ${#lists.size(followers)} + '명)'"></h3>
+      <div th:if="${#lists.isEmpty(followers)}" class="empty">아직 팔로워가 없습니다.</div>
+      <div th:each="f : ${followers}" class="follow-item">
+        <span th:text="${f.name} + ' (' + ${f.email} + ')'"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script th:inline="javascript">
+  const accessToken = /*[[${accessToken}]]*/ '';
+  const myUserId = /*[[${userId}]]*/ 0;
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  function authHeaders(extra) {
+    return Object.assign({ 'Authorization': 'Bearer ' + accessToken }, extra || {});
+  }
+
+  async function apiFetch(url, options) {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      let message = '요청 처리 중 오류가 발생했습니다.';
+      try {
+        const body = await res.json();
+        message = body.message || message;
+      } catch (e) { /* 응답 본문이 없는 경우 무시 */ }
+      throw new Error(message);
+    }
+    if (res.status === 204) return null;
+    return res.json();
+  }
+
+  async function loadPosts() {
+    const list = document.getElementById('post-list');
+    try {
+      const posts = await apiFetch('/posts', { headers: authHeaders() });
+      if (posts.length === 0) {
+        list.innerHTML = '<div class="card empty-feed">아직 게시글이 없습니다. 첫 게시글을 남겨보세요!</div>';
+        return;
+      }
+      list.innerHTML = posts.map(renderPost).join('');
+      posts.forEach(p => loadComments(p.id));
+    } catch (e) {
+      list.innerHTML = '<div class="card empty-feed">게시글을 불러오지 못했습니다.</div>';
+    }
+  }
+
+  function renderPost(post) {
+    const isMine = post.userId === myUserId;
+    return `
+            <div class="card post" id="post-${post.id}">
+                <div class="post-header">
+                    <span class="post-author">${escapeHtml(post.userName)}</span>
+                    ${isMine ? `
+                        <span>
+                            <button class="btn-text" onclick="toggleEditPost(${post.id})">수정</button>
+                            <button class="btn-text danger" onclick="deletePost(${post.id})">삭제</button>
+                        </span>
+                    ` : ''}
+                </div>
+                <div class="post-view-${post.id}">
+                    <div class="post-title">${escapeHtml(post.title)}</div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                </div>
+                <div class="post-edit-area" id="post-edit-${post.id}">
+                    <input type="text" id="edit-title-${post.id}" value="${escapeAttr(post.title)}" />
+                    <textarea rows="3" id="edit-content-${post.id}">${escapeHtml(post.content)}</textarea>
+                    <button class="btn" onclick="updatePost(${post.id})">저장</button>
+                </div>
+                <div class="post-actions">
+                    <button class="btn-like" id="like-btn-${post.id}" onclick="toggleLike(${post.id})">🤍 좋아요</button>
+                </div>
+                <div class="comments" id="comments-${post.id}">
+                    <div class="comment-loading">댓글 불러오는 중...</div>
+                </div>
+                <div class="comment-form">
+                    <input type="text" id="comment-input-${post.id}" placeholder="댓글을 입력하세요" />
+                    <button class="btn-text" onclick="createComment(${post.id})">게시</button>
+                </div>
+            </div>
+        `;
+  }
+
+  function toggleEditPost(postId) {
+    document.getElementById('post-edit-' + postId).classList.toggle('active');
+  }
+
+  async function createPost() {
+    const title = document.getElementById('post-title-input').value.trim();
+    const content = document.getElementById('post-content-input').value.trim();
+    if (!title || !content) {
+      showToast('제목과 내용을 모두 입력해주세요.');
+      return;
+    }
+    try {
+      await apiFetch('/posts', {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ title, content })
+      });
+      document.getElementById('post-title-input').value = '';
+      document.getElementById('post-content-input').value = '';
+      showToast('게시글을 작성했습니다.');
+      loadPosts();
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function updatePost(postId) {
+    const title = document.getElementById('edit-title-' + postId).value.trim();
+    const content = document.getElementById('edit-content-' + postId).value.trim();
+    try {
+      await apiFetch('/posts/' + postId, {
+        method: 'PATCH',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ title, content })
+      });
+      showToast('게시글을 수정했습니다.');
+      loadPosts();
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function deletePost(postId) {
+    if (!confirm('이 게시글을 삭제할까요?')) return;
+    try {
+      await apiFetch('/posts/' + postId, { method: 'DELETE', headers: authHeaders() });
+      showToast('게시글을 삭제했습니다.');
+      loadPosts();
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  const likedPosts = new Set();
+
+  async function toggleLike(postId) {
+    const btn = document.getElementById('like-btn-' + postId);
+    const isLiked = likedPosts.has(postId);
+    try {
+      if (isLiked) {
+        await apiFetch('/posts/' + postId + '/likes', { method: 'DELETE', headers: authHeaders() });
+        likedPosts.delete(postId);
+        btn.textContent = '🤍 좋아요';
+      } else {
+        await apiFetch('/posts/' + postId + '/likes', { method: 'POST', headers: authHeaders() });
+        likedPosts.add(postId);
+        btn.textContent = '❤️ 좋아요 취소';
+      }
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function loadComments(postId) {
+    const container = document.getElementById('comments-' + postId);
+    try {
+      const comments = await apiFetch('/posts/' + postId + '/comments', { headers: authHeaders() });
+      if (!comments || comments.length === 0) {
+        container.innerHTML = '<div class="empty" style="font-size:13px;color:#8e8e8e;">아직 댓글이 없습니다.</div>';
+        return;
+      }
+      container.innerHTML = comments.map(c => renderComment(postId, c)).join('');
+    } catch (e) {
+      container.innerHTML = '';
+    }
+  }
+
+  function renderComment(postId, comment) {
+    const isMine = comment.userId === myUserId;
+    return `
+            <div class="comment-item">
+                <div class="comment-view-${comment.id}">
+                    <b>#${comment.userId}</b>${escapeHtml(comment.content)}
+                </div>
+                ${isMine ? `
+                    <span>
+                        <button class="btn-text" onclick="toggleEditComment(${comment.id})">수정</button>
+                        <button class="btn-text danger" onclick="deleteComment(${postId}, ${comment.id})">삭제</button>
+                    </span>
+                ` : ''}
+            </div>
+            <div class="comment-edit-area" id="comment-edit-${comment.id}">
+                <input type="text" id="comment-edit-input-${comment.id}" value="${escapeAttr(comment.content)}" />
+                <button class="btn-text" onclick="updateComment(${postId}, ${comment.id})">저장</button>
+            </div>
+        `;
+  }
+
+  function toggleEditComment(commentId) {
+    document.getElementById('comment-edit-' + commentId).classList.toggle('active');
+  }
+
+  async function createComment(postId) {
+    const input = document.getElementById('comment-input-' + postId);
+    const content = input.value.trim();
+    if (!content) return;
+    try {
+      await apiFetch('/posts/' + postId + '/comments', {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ content })
+      });
+      input.value = '';
+      loadComments(postId);
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function updateComment(postId, commentId) {
+    const content = document.getElementById('comment-edit-input-' + commentId).value.trim();
+    try {
+      await apiFetch('/posts/' + postId + '/comments/' + commentId, {
+        method: 'PATCH',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ content })
+      });
+      loadComments(postId);
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function deleteComment(postId, commentId) {
+    try {
+      await apiFetch('/posts/' + postId + '/comments/' + commentId, { method: 'DELETE', headers: authHeaders() });
+      loadComments(postId);
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function followUser() {
+    const targetId = document.getElementById('follow-target-id').value.trim();
+    if (!targetId) return;
+    try {
+      await apiFetch('/users/' + targetId + '/follow', { method: 'POST', headers: authHeaders() });
+      showToast('팔로우했습니다.');
+      location.reload();
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function unfollowUser(targetId) {
+    try {
+      await apiFetch('/users/' + targetId + '/follow', { method: 'DELETE', headers: authHeaders() });
+      showToast('언팔로우했습니다.');
+      location.reload();
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function escapeAttr(str) {
+    return escapeHtml(str).replace(/"/g, '&quot;');
+  }
+
+  loadPosts();
+</script>
+</body>
+</html>
