@@ -1,5 +1,6 @@
 package com.example.sns.exception;
 
+import com.example.sns.auth.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +22,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
 
-        ErrorCode code = ErrorCode.UNAUTHORIZED;
+        // JwtFilter에서 만료/서명오류를 구분해서 넣어둔 값이 있으면 그걸 사용,
+        // 없으면(=토큰 자체가 아예 없는 경우) 기존처럼 UNAUTHORIZED
+        ErrorCode code = (ErrorCode) request.getAttribute(JwtFilter.JWT_ERROR_ATTRIBUTE);
+        if (code == null) {
+            code = ErrorCode.UNAUTHORIZED;
+        }
 
         response.setStatus(code.getStatus().value());
         response.setContentType("application/json;charset=UTF-8");
