@@ -27,7 +27,7 @@ public class LikeService {
 
     // 좋아요 추가, 취소
     @Transactional
-    public void toggleLike(Long postId, Long userId) {
+    public boolean toggleLike(Long postId, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         Post post = postRepository.findById(postId)
@@ -37,9 +37,11 @@ public class LikeService {
 
         if (existing.isPresent()) {
             likeRepository.delete(existing.get()); // 좋아요 취소
+            return false;
         }
         else {
             likeRepository.save(Like.create(user, post)); // 좋아요 추가
+            return true;
         }
     }
 
