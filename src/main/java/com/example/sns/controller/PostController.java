@@ -50,15 +50,15 @@ public class PostController {
 
     // 3. 수정 (일부 수정 허용)
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody @Valid PostUpdateRequestDto requestDto) {
-        postService.updatePost(id, requestDto);
+    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody @Valid PostUpdateRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        postService.updatePost(id, requestDto, userDetails.getUserId());
         return ResponseEntity.ok().build();
     }
 
     // 4. 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        postService.deletePost(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        postService.deletePost(id, userDetails.getUserId());
         return ResponseEntity.noContent().build(); // 204 전달
     }
 }

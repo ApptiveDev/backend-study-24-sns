@@ -21,9 +21,11 @@ public enum ErrorCode {
 
     // Post
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_001", "해당 게시글을 찾을 수 없습니다."),
+    POST_FORBIDDEN(HttpStatus.FORBIDDEN, "POST_002", "본인의 게시글만 수정/삭제할 수 있습니다."),
 
     // Comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT_001", "해당 댓글을 찾을 수 없습니다."),
+    COMMENT_FORBIDDEN(HttpStatus.FORBIDDEN, "COMMENT_002", "본인의 댓글만 수정/삭제할 수 있습니다."),
 
     // Common
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_001", "서버 오류가 발생했습니다."),

@@ -58,16 +58,21 @@ public class CommentService {
 
     // 댓글 수정
     @Transactional // 쓰기 권한이 필요함
-    public void updateComment(Long commentId, CommentUpdateRequestDto dto) {
+    public void updateComment(Long commentId, CommentUpdateRequestDto dto, Long userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
-        // 엔티티가 값 검증하고 업데이트함.
+        // 엔티티가 검증하고 업데이트함.
+        comment.validateAuthor(userId);
         comment.update(dto.content());
     }
 
     // 댓글 삭제
     @Transactional // 쓰기 권한이 필요함
-    public void deleteComment(Long commentId) {
-        commentRepository.deleteById(commentId);
+    public void deleteComment(Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
+        // 엔티티가 검증하고 업데이트함.
+        comment.validateAuthor(userId);
+        commentRepository.delete(comment);
     }
 }

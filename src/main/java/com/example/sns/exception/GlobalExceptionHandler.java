@@ -35,9 +35,25 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(code.getCode(), e.getMessage()));
     }
 
+    // 본인 게시글 이외 수정/삭제 금지
+    @ExceptionHandler(PostAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handlePostAccessDenied(PostAccessDeniedException e) {
+        ErrorCode code = e.getErrorCode();
+        return ResponseEntity.status(code.getStatus())
+                .body(new ErrorResponse(code.getCode(), e.getMessage()));
+    }
+
     // 댓글을 찾을 수 없음
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleCommentNotFound(CommentNotFoundException e) {
+        ErrorCode code = e.getErrorCode();
+        return ResponseEntity.status(code.getStatus())
+                .body(new ErrorResponse(code.getCode(), e.getMessage()));
+    }
+
+    // 본인 댓글 이외 수정/삭제 금지
+    @ExceptionHandler(CommentAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleCommentAccessDenied(CommentAccessDeniedException e) {
         ErrorCode code = e.getErrorCode();
         return ResponseEntity.status(code.getStatus())
                 .body(new ErrorResponse(code.getCode(), e.getMessage()));
