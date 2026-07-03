@@ -89,6 +89,11 @@ public class UserService {
         return new TokenResponseDto(newAccessToken);
     }
 
+    // 마이페이지용 유저 단건 조회 (없으면 null)
+    public User getUserOrNull(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
     // 유저 전체 조회 (테스트용)
     public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll().stream()

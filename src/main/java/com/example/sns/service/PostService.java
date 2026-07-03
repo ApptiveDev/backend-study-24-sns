@@ -71,4 +71,9 @@ public class PostService {
         post.validateAuthor(userId);
         postRepository.delete(post);
     }
+
+    // 특정 유저의 게시글 수 조회
+    public long countPostsByUser(User user) {
+        return postRepository.countByUser(user);
+    }
 }
