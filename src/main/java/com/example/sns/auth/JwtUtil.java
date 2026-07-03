@@ -38,27 +38,18 @@ public class JwtUtil {
         return LocalDateTime.now().plusDays(jwtProperties.getRefreshExpiration());
     }
 
-    // 토큰에서 userId 추출
-    public Long getUserId(String token) {
-        Claims claims = Jwts.parser()
+    // 토큰 파싱 (만료/서명오류 등 예외를 그대로 던짐 → 호출부에서 구분해서 처리)
+    public Claims parseClaims(String token) {
+        return Jwts.parser()
                 .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return Long.valueOf(claims.getSubject());
     }
 
-    // 토큰 유효성 검증
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .verifyWith(getSecretKey())
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    // 토큰에서 userId 추출
+    public Long getUserId(String token) {
+        return Long.valueOf(parseClaims(token).getSubject());
     }
 
     // SecretKey를 매번 생성하지 않으려면 @PostConstruct로 캐싱도 가능

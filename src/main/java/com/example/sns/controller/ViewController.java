@@ -6,12 +6,10 @@ import com.example.sns.dto.LoginRequestDto;
 import com.example.sns.dto.LoginResponseDto;
 import com.example.sns.dto.UserRequestDto;
 import com.example.sns.entity.User;
-import com.example.sns.repository.PostRepository;
-import com.example.sns.repository.UserRepository;
 import com.example.sns.service.FollowService;
+import com.example.sns.service.PostService;
 import com.example.sns.service.UserService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ViewController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
+    private final PostService postService;
     private final FollowService followService;
-    private final PostRepository postRepository;
 
     // 로그인 페이지
     @GetMapping("/login")
@@ -103,8 +100,7 @@ public class ViewController {
     public String mypage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
         Long userId = userDetails.getUserId();
 
-        User user = userRepository.findById(userId)
-                .orElse(null);
+        User user = userService.getUserOrNull(userId);
 
         if (user == null) {
             return "redirect:/view/login";
@@ -115,7 +111,7 @@ public class ViewController {
 
         model.addAttribute("username", user.getUsername());
         model.addAttribute("email", user.getEmail());
-        model.addAttribute("postCount", postRepository.countByUser(user));
+        model.addAttribute("postCount", postService.countPostsByUser(user));
         model.addAttribute("followerCount", followers.count());
         model.addAttribute("followingCount", followings.count());
 

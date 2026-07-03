@@ -30,3 +30,4 @@
 - VO 적용 (PostTitle, PostContent 등)
 - VO 완료 후 - DDD 완성 (Aggregate Root, 도메인 로직, validateAuthor 등)
 - 테스트 코드 작성하여 화이트박스 테스트 시행
+  

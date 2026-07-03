@@ -24,7 +24,7 @@ public class FollowService {
 
     // 팔로우, 언팔로우 토글
     @Transactional
-    public void toggleFollow(Long followingId, Long followerId) {
+    public boolean toggleFollow(Long followingId, Long followerId) {
         // 자기 자신은 팔로우 불가
         if (followerId.equals(followingId)) {
             throw new SelfFollowException();
@@ -39,9 +39,11 @@ public class FollowService {
 
         if (existing.isPresent()) {
             followRepository.delete(existing.get()); // 언팔로우
+            return false;
         }
         else {
             followRepository.save(Follow.create(follower, following)); // 팔로우
+            return true;
         }
     }
 

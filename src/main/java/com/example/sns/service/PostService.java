@@ -48,20 +48,32 @@ public class PostService {
                 ));
     }
 
-    // 3. 수정
+    // 수정
     @Transactional
-    public void updatePost(Long id, PostUpdateRequestDto dto) {
+    public void updatePost(Long id, PostUpdateRequestDto dto, Long userId) {
         // DB에서 수정할 글을 먼저 찾아옴.
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
 
         // 엔티티의 데이터를 바꿈. (Transactional 덕분에 자동으로 DB에 반영됨)
-        // 엔티티가 값 검증하고 업데이트함.
+        // 엔티티가 검증하고 업데이트함.
+        post.validateAuthor(userId);
         post.update(dto.title(), dto.content());
     }
 
+    // 삭제
     @Transactional
-    public void deletePost(Long id) {
-        postRepository.deleteById(id);
+    public void deletePost(Long id, Long userId) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException(id));
+
+        // 엔티티가 검증하고 업데이트함.
+        post.validateAuthor(userId);
+        postRepository.delete(post);
+    }
+
+    // 특정 유저의 게시글 수 조회
+    public long countPostsByUser(User user) {
+        return postRepository.countByUser(user);
     }
 }

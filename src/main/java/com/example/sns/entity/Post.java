@@ -1,5 +1,6 @@
 package com.example.sns.entity;
 
+import com.example.sns.exception.PostAccessDeniedException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -62,6 +63,13 @@ public class Post {
             throw new IllegalArgumentException("작성자는 필수입니다.");
         }
         return new Post(title, content, user);
+    }
+
+    // 본인 확인 검증
+    public void validateAuthor(Long userId) {
+        if (this.user == null || !this.user.getId().equals(userId)) {
+            throw new PostAccessDeniedException();
+        }
     }
 
     // 값 검증 및 수정 기능을 위한 함수

@@ -1,5 +1,6 @@
 package com.example.sns.entity;
 
+import com.example.sns.exception.CommentAccessDeniedException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -65,6 +66,13 @@ public class Comment {
             throw new IllegalArgumentException("게시글은 필수입니다.");
         }
         return new Comment(content, user, post);
+    }
+
+    // 본인 확인 검증
+    public void validateAuthor(Long userId) {
+        if (this.user == null || !this.user.getId().equals(userId)) {
+            throw new CommentAccessDeniedException();
+        }
     }
 
     // 값 검증 및 수정

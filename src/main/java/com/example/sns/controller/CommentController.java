@@ -38,15 +38,15 @@ public class CommentController {
 
     // 특정 댓글 수정: PATCH /api/posts/1/comments/3
     @PatchMapping("/{commentId}")
-    public ResponseEntity<Void> update(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody @Valid CommentUpdateRequestDto dto) {
-        commentService.updateComment(commentId, dto);
+    public ResponseEntity<Void> update(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody @Valid CommentUpdateRequestDto dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.updateComment(commentId, dto, userDetails.getUserId());
         return ResponseEntity.ok().build(); // 200 반환
     }
 
     // 특정 댓글 삭제: DELETE /api/posts/1/comments/3
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> delete(@PathVariable Long postId, @PathVariable Long commentId) {
-        commentService.deleteComment(commentId);
+    public ResponseEntity<Void> delete(@PathVariable Long postId, @PathVariable Long commentId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.deleteComment(commentId, userDetails.getUserId());
         return ResponseEntity.noContent().build(); // 204 반환
     }
 }
