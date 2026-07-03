@@ -59,10 +59,10 @@ public class UserService {
         LocalDateTime expiresAt = jwtUtil.getRefreshTokenExpiresAt();
 
         // DB에 Refresh Token 저장 (이미 있으면 갱신)
-        refreshTokenRepository.findByUserId(user.getId())
+        refreshTokenRepository.findByUser(user)
                 .ifPresentOrElse(
                         token -> token.updateToken(refreshToken, expiresAt),
-                        () -> refreshTokenRepository.save(RefreshToken.create(user.getId(), refreshToken, expiresAt))
+                        () -> refreshTokenRepository.save(RefreshToken.create(user, refreshToken, expiresAt))
                 );
 
         return new LoginResponseDto(accessToken, refreshToken);
@@ -80,7 +80,7 @@ public class UserService {
         }
 
         // 3. 새 Access Token 발급
-        String newAccessToken = jwtUtil.generateAccessToken(refreshToken.getUserId());
+        String newAccessToken = jwtUtil.generateAccessToken(refreshToken.getUser().getId());
 
         return new TokenResponseDto(newAccessToken);
     }
