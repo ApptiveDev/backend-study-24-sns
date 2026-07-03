@@ -11,6 +11,7 @@ import com.example.sns.exception.RefreshTokenNotFoundException;
 import com.example.sns.repository.RefreshTokenRepository;
 import com.example.sns.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-    private final RefreshTokenRepository refreshTokenRepository; // 추가
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 유저 등록 (회원가입)
     @Transactional // 저장할 때는 쓰기 권한이 필요함
@@ -34,7 +36,9 @@ public class UserService {
             throw new DuplicateEmailException(dto.email());
         }
 
-        User user = User.create(dto.username(), dto.email(), dto.password());
+        // 비밀번호 해싱 후 저장
+        String encodedPassword = passwordEncoder.encode(dto.password());
+        User user = User.create(dto.username(), dto.email(), encodedPassword);
         User savedUser = userRepository.save(user);
 
         // 엔티티를 응답 DTO로 변환해서 반환
@@ -49,7 +53,7 @@ public class UserService {
                 .orElseThrow(InvalidLoginException::new);
 
         // 2. 비밀번호 확인
-        if (!user.getPassword().equals(dto.password())) {
+        if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
             throw new InvalidLoginException();
         }
 
