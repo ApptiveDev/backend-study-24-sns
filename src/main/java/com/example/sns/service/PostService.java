@@ -76,4 +76,19 @@ public class PostService {
     public long countPostsByUser(User user) {
         return postRepository.countByUser(user);
     }
+
+    // 단건 조회 (상세 화면용)
+    public PostResponseDto getPost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException(id));
+
+        return new PostResponseDto(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getUser().getUsername(),
+                post.getCreatedAt(),
+                post.getUpdatedAt()
+        );
+    }
 }
