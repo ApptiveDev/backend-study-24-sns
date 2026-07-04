@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${profileUser.username} + ' - SNS'">프로필 - SNS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+        }
+
+        nav {
+            background: #fff;
+            border-bottom: 1px solid #dbdbdb;
+            padding: 0 20px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+        }
+
+        .nav-logo { font-size: 22px; font-weight: 700; letter-spacing: -1px; color: #262626; }
+        .nav-back { font-size: 13px; color: #262626; text-decoration: none; }
+
+        .profile-section { max-width: 640px; margin: 40px auto; padding: 0 20px; }
+
+        .profile-card {
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 36px 40px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .avatar {
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-main { flex: 1; }
+
+        .profile-username {
+            font-size: 22px;
+            font-weight: 300;
+            color: #262626;
+            margin-bottom: 12px;
+        }
+
+        .profile-stats { display: flex; gap: 32px; }
+
+        .stat-item { text-align: center; }
+
+        .stat-count {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            display: block;
+        }
+
+        .stat-label { font-size: 13px; color: #8e8e8e; }
+
+        .btn-follow {
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .btn-follow.not-following {
+            background: #0095f6;
+            color: #fff;
+        }
+
+        .btn-follow.not-following:hover { background: #1877f2; }
+
+        .btn-follow.following {
+            background: #fff;
+            color: #262626;
+            border: 1px solid #dbdbdb;
+        }
+
+        .btn-follow.following:hover { background: #fafafa; color: #ed4956; border-color: #ed4956; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="nav-logo">SNS</span>
+    <a href="/view/posts" class="nav-back">← 게시글 목록</a>
+</nav>
+
+<div class="profile-section">
+    <div class="profile-card">
+        <div class="avatar" th:text="${#strings.substring(profileUser.username, 0, 1)}">U</div>
+
+        <div class="profile-info">
+            <div class="profile-main">
+                <div class="profile-username" th:text="${profileUser.username}">username</div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-count" th:text="${postCount}">0</span>
+                        <span class="stat-label">게시물</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-count" th:text="${followerCount}">0</span>
+                        <span class="stat-label">팔로워</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-count" th:text="${followingCount}">0</span>
+                        <span class="stat-label">팔로잉</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 본인 프로필이 아닐 때만 팔로우 버튼 노출 -->
+            <form th:unless="${isMe}"
+                  th:action="@{/view/users/{id}/follow(id=${profileUser.id})}"
+                  method="post">
+                <button type="submit" class="btn-follow"
+                        th:classappend="${isFollowing} ? 'following' : 'not-following'"
+                        th:text="${isFollowing} ? '팔로잉' : '팔로우'">
+                    팔로우
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

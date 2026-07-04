@@ -72,4 +72,14 @@ public class FollowService {
 
         return new FollowResponseDto(usernames.size(), usernames);
     }
+
+    // 내가(followerId) 특정 유저(followingId)를 팔로우 중인지 확인
+    public boolean isFollowing(Long followerId, Long followingId) {
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new UserNotFoundException(followerId));
+        User following = userRepository.findById(followingId)
+                .orElseThrow(() -> new UserNotFoundException(followingId));
+
+        return followRepository.findByFollowerAndFollowing(follower, following).isPresent();
+    }
 }

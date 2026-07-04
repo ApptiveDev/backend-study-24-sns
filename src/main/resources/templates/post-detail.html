@@ -111,7 +111,6 @@
 
         .comment-item:last-child { border-bottom: none; }
 
-        .comment-body strong { color: #262626; margin-right: 6px; }
         .comment-body span { color: #444; }
         .comment-time { font-size: 12px; color: #c7c7c7; margin-top: 2px; }
 
@@ -125,6 +124,14 @@
         }
 
         .btn-delete-comment:hover { color: #ed4956; }
+
+        .comment-author-link {
+            color: #262626;
+            font-weight: 600;
+            text-decoration: none;
+            margin-right: 6px;
+        }
+        .comment-author-link:hover { text-decoration: underline; }
 
         .comment-form { display: flex; gap: 8px; margin-top: 16px; }
 
@@ -167,7 +174,9 @@
     <div class="post-card">
         <div class="post-title" th:text="${post.title}">제목</div>
         <div class="post-meta">
-            <span th:text="${post.username}">작성자</span> ·
+            <a th:href="@{/view/users/{id}(id=${post.userId})}"
+               th:text="${post.username}"
+               style="color:#262626; font-weight:600; text-decoration:none;">작성자</a> ·
             <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
         </div>
         <div class="post-content" th:text="${post.content}">내용</div>
@@ -198,7 +207,9 @@
         <div class="comment-item" th:each="comment : ${comments}">
             <div class="comment-body">
                 <div>
-                    <strong th:text="${comment.username}">작성자</strong>
+                    <a th:href="@{/view/users/{id}(id=${comment.userId})}"
+                       th:text="${comment.username}"
+                       class="comment-author-link">작성자</a>
                     <span th:text="${comment.content}">댓글 내용</span>
                 </div>
                 <div class="comment-time" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</div>

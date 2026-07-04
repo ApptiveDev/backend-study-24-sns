@@ -42,6 +42,7 @@ public class PostService {
                         post.getId(),
                         post.getTitle(),
                         post.getContent(),
+                        post.getUser().getId(),
                         post.getUser().getUsername(),
                         post.getCreatedAt(),
                         post.getUpdatedAt()
@@ -86,6 +87,7 @@ public class PostService {
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
+                post.getUser().getId(),
                 post.getUser().getUsername(),
                 post.getCreatedAt(),
                 post.getUpdatedAt()

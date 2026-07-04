@@ -291,4 +291,47 @@ public class ViewController {
         return "redirect:/view/posts/" + id;
     }
 
+
+    // 다른 유저 프로필 보기
+    @GetMapping("/users/{id}")
+    public String userProfile(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model
+    ) {
+        User targetUser = userService.getUserOrNull(id);
+        if (targetUser == null) {
+            return "redirect:/view/posts";
+        }
+
+        Long myUserId = userDetails.getUserId();
+        boolean isMe = myUserId.equals(id);
+
+        FollowResponseDto followers = followService.getFollowers(id);
+        FollowResponseDto followings = followService.getFollowings(id);
+
+        model.addAttribute("profileUser", targetUser);
+        model.addAttribute("isMe", isMe);
+        model.addAttribute("postCount", postService.countPostsByUser(targetUser));
+        model.addAttribute("followerCount", followers.count());
+        model.addAttribute("followingCount", followings.count());
+
+        // 본인이 아닐 때만 팔로우 여부 확인 (본인 프로필엔 팔로우 버튼 자체가 없음)
+        if (!isMe) {
+            model.addAttribute("isFollowing", followService.isFollowing(myUserId, id));
+        }
+
+        return "user-profile";
+    }
+
+
+    // 팔로우/언팔로우 토글 (뷰용)
+    @PostMapping("/users/{id}/follow")
+    public String toggleFollowView(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        followService.toggleFollow(id, userDetails.getUserId());
+        return "redirect:/view/users/" + id;
+    }
 }

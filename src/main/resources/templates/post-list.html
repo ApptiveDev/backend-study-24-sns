@@ -67,6 +67,13 @@
             margin-bottom: 10px;
         }
 
+        .author-link {
+            color: #262626;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .author-link:hover { text-decoration: underline; }
+
         .post-preview {
             font-size: 14px;
             color: #444;
@@ -121,18 +128,18 @@
         아직 작성된 게시글이 없습니다.
     </div>
 
-    <a th:each="post : ${posts.content}"
-       th:href="@{/view/posts/{id}(id=${post.id})}"
-       style="text-decoration:none;">
-        <div class="post-card">
-            <div class="post-title" th:text="${post.title}">제목</div>
-            <div class="post-meta">
-                <span th:text="${post.username}">작성자</span> ·
-                <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
-            </div>
-            <div class="post-preview" th:text="${post.content}">내용 미리보기</div>
+    <div th:each="post : ${posts.content}" class="post-card"
+         th:onclick="'location.href=\'' + @{/view/posts/{id}(id=${post.id})} + '\''">
+        <div class="post-title" th:text="${post.title}">제목</div>
+        <div class="post-meta">
+            <a th:href="@{/view/users/{id}(id=${post.userId})}"
+               th:text="${post.username}"
+               class="author-link"
+               onclick="event.stopPropagation();">작성자</a> ·
+            <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
         </div>
-    </a>
+        <div class="post-preview" th:text="${post.content}">내용 미리보기</div>
+    </div>
 
     <div class="pagination" th:if="${posts.totalPages > 1}">
         <a th:if="${posts.hasPrevious()}"
