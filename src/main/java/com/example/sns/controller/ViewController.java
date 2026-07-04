@@ -31,6 +31,38 @@ public class ViewController {
     private final LikeService likeService;
     private final FollowService followService;
 
+
+    // 회원가입
+    // 회원가입 페이지
+    @GetMapping("/register")
+    public String registerPage(Model model) {
+        model.addAttribute("registerForm", new UserRequestDto("", "", ""));
+        return "register";
+    }
+
+    // 회원가입 처리
+    @PostMapping("/register")
+    public String register(
+            @ModelAttribute("registerForm") @Valid UserRequestDto dto,
+            BindingResult bindingResult,
+            Model model
+    ) {
+        if (bindingResult.hasErrors()) {
+            return "register";
+        }
+
+        try {
+            userService.createUser(dto);
+            return "redirect:/view/login";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "register";
+        }
+    }
+
+
+    // 로그인
     // 로그인 페이지
     @GetMapping("/login")
     public String loginPage(Model model) {
@@ -67,33 +99,17 @@ public class ViewController {
         }
     }
 
-    // 회원가입 페이지
-    @GetMapping("/register")
-    public String registerPage(Model model) {
-        model.addAttribute("registerForm", new UserRequestDto("", "", ""));
-        return "register";
+    // 로그아웃
+    @PostMapping("/logout")
+    public String logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("accessToken", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        return "redirect:/view/login";
     }
 
-    // 회원가입 처리
-    @PostMapping("/register")
-    public String register(
-            @ModelAttribute("registerForm") @Valid UserRequestDto dto,
-            BindingResult bindingResult,
-            Model model
-    ) {
-        if (bindingResult.hasErrors()) {
-            return "register";
-        }
-
-        try {
-            userService.createUser(dto);
-            return "redirect:/view/login";
-
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "register";
-        }
-    }
 
     // 마이페이지
     @GetMapping("/mypage")
@@ -118,6 +134,8 @@ public class ViewController {
         return "mypage";
     }
 
+
+    // 게시글
     // 게시글 작성 페이지
     @GetMapping("/posts/new")
     public String postWritePage(Model model) {
@@ -180,6 +198,62 @@ public class ViewController {
         return "post-detail";
     }
 
+    // 게시글 수정 페이지
+    @GetMapping("/posts/{id}/edit")
+    public String postEditPage(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model
+    ) {
+        PostResponseDto post = postService.getPost(id);
+
+        // 본인 글이 아니면 상세로 되돌림
+        User currentUser = userService.getUserOrNull(userDetails.getUserId());
+        if (!post.username().equals(currentUser.getUsername())) {
+            return "redirect:/view/posts/" + id;
+        }
+
+        model.addAttribute("post", post);
+        model.addAttribute("postForm", new PostUpdateRequestDto(post.title(), post.content()));
+        return "post-edit";
+    }
+
+    // 게시글 수정 처리
+    @PostMapping("/posts/{id}/edit")
+    public String updatePost(
+            @PathVariable Long id,
+            @ModelAttribute("postForm") @Valid PostUpdateRequestDto dto,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model
+    ) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("post", postService.getPost(id));
+            return "post-edit";
+        }
+
+        try {
+            postService.updatePost(id, dto, userDetails.getUserId());
+            return "redirect:/view/posts/" + id;
+        } catch (Exception e) {
+            model.addAttribute("post", postService.getPost(id));
+            model.addAttribute("errorMessage", e.getMessage());
+            return "post-edit";
+        }
+    }
+
+    // 게시글 삭제 처리
+    @PostMapping("/posts/{id}/delete")
+    public String deletePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        postService.deletePost(id, userDetails.getUserId());
+        return "redirect:/view/posts";
+    }
+
+
+    // 댓글
     // 댓글 작성 (뷰에서 폼 제출)
     @PostMapping("/posts/{id}/comments")
     public String createComment(
@@ -205,6 +279,8 @@ public class ViewController {
         return "redirect:/view/posts/" + postId;
     }
 
+
+    // 좋아요
     // 좋아요 토글
     @PostMapping("/posts/{id}/likes")
     public String toggleLike(
@@ -215,14 +291,4 @@ public class ViewController {
         return "redirect:/view/posts/" + id;
     }
 
-    // 로그아웃
-    @PostMapping("/logout")
-    public String logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("accessToken", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-
-        return "redirect:/view/login";
-    }
 }

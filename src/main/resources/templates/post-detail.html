@@ -54,6 +54,28 @@
             padding-top: 16px;
         }
 
+        .owner-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            border: 1px solid #dbdbdb;
+            background: #fff;
+            color: #262626;
+        }
+
+        .btn-edit:hover { background: #fafafa; }
+        .btn-delete { color: #ed4956; }
+        .btn-delete:hover { background: #fff3f3; }
+
         .btn-like {
             border: 1px solid #dbdbdb;
             border-radius: 20px;
@@ -158,6 +180,14 @@
             </form>
             <span class="like-count" th:text="${likes.likeCount} + '명이 좋아합니다'">0명이 좋아합니다</span>
         </div>
+    </div>
+
+    <div class="owner-actions" th:if="${post.username == currentUsername}">
+        <a th:href="@{/view/posts/{id}/edit(id=${post.id})}" class="btn-edit">수정</a>
+        <form th:action="@{/view/posts/{id}/delete(id=${post.id})}" method="post"
+              onsubmit="return confirm('삭제하시겠습니까?');" style="display:inline;">
+            <button type="submit" class="btn-delete">삭제</button>
+        </form>
     </div>
 
     <div class="comment-card">
