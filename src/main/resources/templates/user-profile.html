@@ -127,14 +127,14 @@
                         <span class="stat-count" th:text="${postCount}">0</span>
                         <span class="stat-label">게시물</span>
                     </div>
-                    <div class="stat-item">
+                    <a th:href="@{/view/users/{id}/followers(id=${profileUser.id})}" class="stat-item" style="text-decoration:none; color:inherit;">
                         <span class="stat-count" th:text="${followerCount}">0</span>
                         <span class="stat-label">팔로워</span>
-                    </div>
-                    <div class="stat-item">
+                    </a>
+                    <a th:href="@{/view/users/{id}/followings(id=${profileUser.id})}" class="stat-item" style="text-decoration:none; color:inherit;">
                         <span class="stat-count" th:text="${followingCount}">0</span>
                         <span class="stat-label">팔로잉</span>
-                    </div>
+                    </a>
                 </div>
             </div>
 

@@ -125,6 +125,7 @@ public class ViewController {
         FollowResponseDto followers = followService.getFollowers(userId);
         FollowResponseDto followings = followService.getFollowings(userId);
 
+        model.addAttribute("userId", userId);
         model.addAttribute("username", user.getUsername());
         model.addAttribute("email", user.getEmail());
         model.addAttribute("postCount", postService.countPostsByUser(user));
@@ -325,6 +326,7 @@ public class ViewController {
     }
 
 
+    // 팔로우
     // 팔로우/언팔로우 토글 (뷰용)
     @PostMapping("/users/{id}/follow")
     public String toggleFollowView(
@@ -333,5 +335,37 @@ public class ViewController {
     ) {
         followService.toggleFollow(id, userDetails.getUserId());
         return "redirect:/view/users/" + id;
+    }
+
+    // 팔로워 목록
+    @GetMapping("/users/{id}/followers")
+    public String followerList(@PathVariable Long id, Model model) {
+        User targetUser = userService.getUserOrNull(id);
+        if (targetUser == null) {
+            return "redirect:/view/posts";
+        }
+
+        FollowResponseDto followers = followService.getFollowers(id);
+
+        model.addAttribute("profileUser", targetUser);
+        model.addAttribute("users", followers.users());
+        model.addAttribute("listTitle", "팔로워");
+        return "follow-list";
+    }
+
+    // 팔로잉 목록
+    @GetMapping("/users/{id}/followings")
+    public String followingList(@PathVariable Long id, Model model) {
+        User targetUser = userService.getUserOrNull(id);
+        if (targetUser == null) {
+            return "redirect:/view/posts";
+        }
+
+        FollowResponseDto followings = followService.getFollowings(id);
+
+        model.addAttribute("profileUser", targetUser);
+        model.addAttribute("users", followings.users());
+        model.addAttribute("listTitle", "팔로잉");
+        return "follow-list";
     }
 }
