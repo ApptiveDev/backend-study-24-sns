@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${profileUser.username} + '의 ' + ${listTitle} + ' - SNS'">목록 - SNS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+        }
+
+        nav {
+            background: #fff;
+            border-bottom: 1px solid #dbdbdb;
+            padding: 0 20px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+        }
+
+        .nav-logo { font-size: 22px; font-weight: 700; letter-spacing: -1px; color: #262626; }
+        .nav-back { font-size: 13px; color: #262626; text-decoration: none; }
+
+        .list-container { max-width: 480px; margin: 32px auto; padding: 0 20px; }
+
+        .list-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 16px;
+        }
+
+        .list-header span { color: #8e8e8e; font-weight: 400; }
+
+        .list-card {
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 8px 0;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 20px;
+            text-decoration: none;
+            transition: background 0.1s;
+        }
+
+        .user-item:hover { background: #fafafa; }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .empty-box {
+            text-align: center;
+            color: #8e8e8e;
+            padding: 40px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="nav-logo">SNS</span>
+    <a th:href="@{/view/users/{id}(id=${profileUser.id})}" class="nav-back">← 프로필로</a>
+</nav>
+
+<div class="list-container">
+
+    <div class="list-header">
+        <span th:text="${profileUser.username}">username</span>님의 <span th:text="${listTitle}">팔로워</span>
+    </div>
+
+    <div class="list-card">
+        <div th:if="${users.empty}" class="empty-box">
+            아직 <span th:text="${listTitle}">팔로워</span>가 없습니다.
+        </div>
+
+        <a th:each="user : ${users}"
+           th:href="@{/view/users/{id}(id=${user.userId})}"
+           class="user-item">
+            <div class="user-avatar" th:text="${#strings.substring(user.username, 0, 1)}">U</div>
+            <div class="user-name" th:text="${user.username}">username</div>
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>

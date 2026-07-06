@@ -12,7 +12,6 @@
             background: #fafafa;
         }
 
-        /* 상단 네비게이션 */
         nav {
             background: #fff;
             border-bottom: 1px solid #dbdbdb;
@@ -33,7 +32,13 @@
             color: #262626;
         }
 
-        .nav-logout form { display: inline; }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-right form { display: inline; }
 
         .btn-logout {
             background: none;
@@ -82,6 +87,13 @@
 
         .profile-info {
             flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-main {
+            flex: 1;
         }
 
         .profile-username {
@@ -98,6 +110,8 @@
 
         .stat-item {
             text-align: center;
+            color: inherit;
+            display: block;
         }
 
         .stat-count {
@@ -111,6 +125,21 @@
             font-size: 13px;
             color: #8e8e8e;
         }
+
+        .btn-write {
+            background: #0095f6;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+
+        .btn-write:hover { background: #1877f2; }
 
         /* 정보 카드 */
         .info-card {
@@ -170,7 +199,8 @@
 
 <nav>
     <span class="nav-logo">SNS</span>
-    <div class="nav-logout">
+    <div class="nav-right">
+        <a href="/view/posts" style="font-size:13px; color:#262626; text-decoration:none;">게시글 목록</a>
         <form th:action="@{/view/logout}" method="post">
             <button type="submit" class="btn-logout">로그아웃</button>
         </form>
@@ -190,21 +220,25 @@
         <div class="avatar" th:text="${#strings.substring(username, 0, 1)}">U</div>
 
         <div class="profile-info">
-            <div class="profile-username" th:text="${username}">username</div>
-            <div class="profile-stats">
-                <div class="stat-item">
-                    <span class="stat-count" th:text="${postCount}">0</span>
-                    <span class="stat-label">게시물</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-count" th:text="${followerCount}">0</span>
-                    <span class="stat-label">팔로워</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-count" th:text="${followingCount}">0</span>
-                    <span class="stat-label">팔로잉</span>
+            <div class="profile-main">
+                <div class="profile-username" th:text="${username}">username</div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-count" th:text="${postCount}">0</span>
+                        <span class="stat-label">게시물</span>
+                    </div>
+                    <a th:href="@{/view/users/{id}/followers(id=${userId})}" class="stat-item" style="text-decoration:none;">
+                        <span class="stat-count" th:text="${followerCount}">0</span>
+                        <span class="stat-label">팔로워</span>
+                    </a>
+                    <a th:href="@{/view/users/{id}/followings(id=${userId})}" class="stat-item" style="text-decoration:none;">
+                        <span class="stat-count" th:text="${followingCount}">0</span>
+                        <span class="stat-label">팔로잉</span>
+                    </a>
                 </div>
             </div>
+
+            <a href="/view/posts/new" class="btn-write">글쓰기</a>
         </div>
     </div>
 

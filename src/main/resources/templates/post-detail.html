@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${post.title}">게시글 - SNS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fafafa; }
+
+        nav {
+            background: #fff;
+            border-bottom: 1px solid #dbdbdb;
+            padding: 0 20px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+        }
+
+        .nav-logo { font-size: 22px; font-weight: 700; letter-spacing: -1px; color: #262626; }
+        .nav-back { font-size: 13px; color: #262626; text-decoration: none; }
+
+        .detail-container { max-width: 600px; margin: 32px auto; padding: 0 20px; }
+
+        .post-card {
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 28px 32px;
+            margin-bottom: 16px;
+        }
+
+        .post-title { font-size: 20px; font-weight: 700; color: #262626; margin-bottom: 8px; }
+
+        .post-meta { font-size: 13px; color: #8e8e8e; margin-bottom: 20px; }
+
+        .post-content {
+            font-size: 15px;
+            color: #262626;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+        }
+
+        .action-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid #fafafa;
+            padding-top: 16px;
+        }
+
+        .owner-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            border: 1px solid #dbdbdb;
+            background: #fff;
+            color: #262626;
+        }
+
+        .btn-edit:hover { background: #fafafa; }
+        .btn-delete { color: #ed4956; }
+        .btn-delete:hover { background: #fff3f3; }
+
+        .btn-like {
+            border: 1px solid #dbdbdb;
+            border-radius: 20px;
+            background: #fff;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-like.liked { background: #ffe8ec; color: #ed4956; border-color: #ed4956; }
+
+        .like-count { font-size: 13px; color: #8e8e8e; }
+
+        /* 댓글 카드 */
+        .comment-card {
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 20px 24px;
+        }
+
+        .comment-card h3 { font-size: 14px; font-weight: 600; color: #8e8e8e; margin-bottom: 16px; }
+
+        .comment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px solid #fafafa;
+            font-size: 14px;
+        }
+
+        .comment-item:last-child { border-bottom: none; }
+
+        .comment-body span { color: #444; }
+        .comment-time { font-size: 12px; color: #c7c7c7; margin-top: 2px; }
+
+        .btn-delete-comment {
+            background: none;
+            border: none;
+            color: #c7c7c7;
+            font-size: 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-delete-comment:hover { color: #ed4956; }
+
+        .comment-author-link {
+            color: #262626;
+            font-weight: 600;
+            text-decoration: none;
+            margin-right: 6px;
+        }
+        .comment-author-link:hover { text-decoration: underline; }
+
+        .comment-form { display: flex; gap: 8px; margin-top: 16px; }
+
+        .comment-form input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #dbdbdb;
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .comment-form input:focus { border-color: #a8a8a8; }
+
+        .btn-comment-submit {
+            background: #0095f6;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-comment-submit:hover { background: #1877f2; }
+
+        .no-comments { text-align: center; color: #c7c7c7; font-size: 13px; padding: 20px 0; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="nav-logo">SNS</span>
+    <a href="/view/posts" class="nav-back">← 목록으로</a>
+</nav>
+
+<div class="detail-container">
+
+    <div class="post-card">
+        <div class="post-title" th:text="${post.title}">제목</div>
+        <div class="post-meta">
+            <a th:href="@{/view/users/{id}(id=${post.userId})}"
+               th:text="${post.username}"
+               style="color:#262626; font-weight:600; text-decoration:none;">작성자</a> ·
+            <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+        </div>
+        <div class="post-content" th:text="${post.content}">내용</div>
+
+        <div class="action-row">
+            <form th:action="@{/view/posts/{id}/likes(id=${post.id})}" method="post">
+                <button type="submit" class="btn-like" th:classappend="${liked} ? 'liked'">
+                    <span th:text="${liked} ? '♥ 좋아요 취소' : '♡ 좋아요'">좋아요</span>
+                </button>
+            </form>
+            <span class="like-count" th:text="${likes.likeCount} + '명이 좋아합니다'">0명이 좋아합니다</span>
+        </div>
+    </div>
+
+    <div class="owner-actions" th:if="${post.username == currentUsername}">
+        <a th:href="@{/view/posts/{id}/edit(id=${post.id})}" class="btn-edit">수정</a>
+        <form th:action="@{/view/posts/{id}/delete(id=${post.id})}" method="post"
+              onsubmit="return confirm('삭제하시겠습니까?');" style="display:inline;">
+            <button type="submit" class="btn-delete">삭제</button>
+        </form>
+    </div>
+
+    <div class="comment-card">
+        <h3 th:text="'댓글 ' + ${comments.size()} + '개'">댓글</h3>
+
+        <div th:if="${comments.empty}" class="no-comments">아직 댓글이 없습니다.</div>
+
+        <div class="comment-item" th:each="comment : ${comments}">
+            <div class="comment-body">
+                <div>
+                    <a th:href="@{/view/users/{id}(id=${comment.userId})}"
+                       th:text="${comment.username}"
+                       class="comment-author-link">작성자</a>
+                    <span th:text="${comment.content}">댓글 내용</span>
+                </div>
+                <div class="comment-time" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</div>
+            </div>
+            <form th:if="${comment.username == currentUsername}"
+                  th:action="@{/view/posts/{postId}/comments/{commentId}/delete(postId=${post.id},commentId=${comment.commentId})}"
+                  method="post">
+                <button type="submit" class="btn-delete-comment">삭제</button>
+            </form>
+        </div>
+
+        <form class="comment-form" th:action="@{/view/posts/{id}/comments(id=${post.id})}"
+              th:object="${commentForm}" method="post">
+            <input type="text" th:field="*{content}" placeholder="댓글을 입력하세요..." />
+            <button type="submit" class="btn-comment-submit">등록</button>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

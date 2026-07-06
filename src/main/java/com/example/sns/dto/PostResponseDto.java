@@ -7,6 +7,7 @@ public record PostResponseDto(
         Long id,
         String title,
         String content,
+        Long userId,
         String username,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

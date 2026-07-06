@@ -1,6 +1,7 @@
 package com.example.sns.service;
 
 import com.example.sns.dto.FollowResponseDto;
+import com.example.sns.dto.FollowUserDto;
 import com.example.sns.entity.Follow;
 import com.example.sns.entity.User;
 import com.example.sns.exception.SelfFollowException;
@@ -53,11 +54,11 @@ public class FollowService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         List<Follow> followers = followRepository.findFollowersByUser(user);
-        List<String> usernames = followers.stream()
-                .map(f -> f.getFollower().getUsername())
+        List<FollowUserDto> users = followers.stream()
+                .map(f -> new FollowUserDto(f.getFollower().getId(), f.getFollower().getUsername()))
                 .toList();
 
-        return new FollowResponseDto(usernames.size(), usernames);
+        return new FollowResponseDto(users.size(), users);
     }
 
     // 팔로잉 목록 조회 (특정 유저가 팔로우하는 사람들)
@@ -66,10 +67,20 @@ public class FollowService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         List<Follow> followings = followRepository.findFollowingsByUser(user);
-        List<String> usernames = followings.stream()
-                .map(f -> f.getFollowing().getUsername())
+        List<FollowUserDto> users = followings.stream()
+                .map(f -> new FollowUserDto(f.getFollowing().getId(), f.getFollowing().getUsername()))
                 .toList();
 
-        return new FollowResponseDto(usernames.size(), usernames);
+        return new FollowResponseDto(users.size(), users);
+    }
+
+    // 내가(followerId) 특정 유저(followingId)를 팔로우 중인지 확인
+    public boolean isFollowing(Long followerId, Long followingId) {
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new UserNotFoundException(followerId));
+        User following = userRepository.findById(followingId)
+                .orElseThrow(() -> new UserNotFoundException(followingId));
+
+        return followRepository.findByFollowerAndFollowing(follower, following).isPresent();
     }
 }

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 수정 - SNS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+        }
+
+        nav {
+            background: #fff;
+            border-bottom: 1px solid #dbdbdb;
+            padding: 0 20px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+        }
+
+        .nav-logo { font-size: 22px; font-weight: 700; letter-spacing: -1px; color: #262626; }
+
+        .write-container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+
+        .write-card {
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 32px;
+        }
+
+        .write-card h2 { font-size: 18px; font-weight: 600; color: #262626; margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 14px; }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #fafafa;
+            outline: none;
+            font-family: inherit;
+        }
+
+        textarea { resize: vertical; min-height: 160px; }
+        input:focus, textarea:focus { border-color: #a8a8a8; background: #fff; }
+
+        .error-box {
+            background: #fff3f3;
+            border: 1px solid #ed4956;
+            border-radius: 4px;
+            padding: 10px 12px;
+            color: #ed4956;
+            font-size: 13px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .btn-row { display: flex; gap: 8px; margin-top: 8px; }
+
+        .btn-submit, .btn-cancel {
+            flex: 1;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-submit { background: #0095f6; color: #fff; border: none; }
+        .btn-submit:hover { background: #1877f2; }
+        .btn-cancel { background: #fff; color: #262626; border: 1px solid #dbdbdb; }
+        .btn-cancel:hover { background: #fafafa; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="nav-logo">SNS</span>
+</nav>
+
+<div class="write-container">
+    <div class="write-card">
+        <h2>게시글 수정</h2>
+
+        <div class="error-box" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/view/posts/{id}/edit(id=${post.id})}" th:object="${postForm}" method="post">
+
+            <div class="form-group">
+                <input type="text" th:field="*{title}" placeholder="제목" />
+            </div>
+
+            <div class="form-group">
+                <textarea th:field="*{content}" placeholder="내용을 입력하세요"></textarea>
+            </div>
+
+            <div class="btn-row">
+                <a th:href="@{/view/posts/{id}(id=${post.id})}" class="btn-cancel">취소</a>
+                <button type="submit" class="btn-submit">수정 완료</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
