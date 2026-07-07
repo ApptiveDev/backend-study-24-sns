@@ -30,6 +30,7 @@ public class ViewController {
     private final CommentService commentService;
     private final LikeService likeService;
     private final FollowService followService;
+    private final AuthService authService;
 
 
     // 회원가입
@@ -83,7 +84,7 @@ public class ViewController {
         }
 
         try {
-            LoginResponseDto tokens = userService.login(dto);
+            LoginResponseDto tokens = authService.login(dto);
 
             Cookie cookie = new Cookie("accessToken", tokens.accessToken());
             cookie.setHttpOnly(true);
@@ -101,8 +102,13 @@ public class ViewController {
 
     // 로그아웃
     @PostMapping("/logout")
-    public String logout(HttpServletResponse response) {
+    public String logout(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletResponse response) {
+        if (userDetails != null) {
+            authService.logout(userDetails.getUserId());
+        }
+
         Cookie cookie = new Cookie("accessToken", null);
+        cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
         cookie.setPath("/");
         response.addCookie(cookie);

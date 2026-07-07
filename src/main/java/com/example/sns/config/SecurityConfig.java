@@ -35,8 +35,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/users",         // 회원가입
-                                "/api/users/login",   // 로그인
-                                "/api/users/refresh", // 토큰 재발급
+                                "/api/auth/login",   // 로그인
+                                "/api/auth/refresh", // 토큰 재발급
                                 "/h2-console/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",

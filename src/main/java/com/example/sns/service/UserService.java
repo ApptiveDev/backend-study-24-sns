@@ -45,50 +45,6 @@ public class UserService {
         return new UserResponseDto(savedUser.getId(), savedUser.getUsername());
     }
 
-    // 로그인
-    @Transactional
-    public LoginResponseDto login(LoginRequestDto dto) {
-        // 1. 이메일로 유저 찾기
-        User user = userRepository.findByEmail(dto.email())
-                .orElseThrow(InvalidLoginException::new);
-
-        // 2. 비밀번호 확인
-        if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
-            throw new InvalidLoginException();
-        }
-
-        // 3. JWT 발급
-        String accessToken = jwtUtil.generateAccessToken(user.getId());
-        String refreshToken = jwtUtil.generateRefreshToken();
-        LocalDateTime expiresAt = jwtUtil.getRefreshTokenExpiresAt();
-
-        // DB에 Refresh Token 저장 (이미 있으면 갱신)
-        refreshTokenRepository.findByUser(user)
-                .ifPresentOrElse(
-                        token -> token.updateToken(refreshToken, expiresAt),
-                        () -> refreshTokenRepository.save(RefreshToken.create(user, refreshToken, expiresAt))
-                );
-
-        return new LoginResponseDto(accessToken, refreshToken);
-    }
-
-    // Access Token 재발급
-    public TokenResponseDto reissueAccessToken(RefreshRequestDto dto) {
-        // 1. DB에서 Refresh Token 확인
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(dto.refreshToken())
-                .orElseThrow(RefreshTokenNotFoundException::new);
-
-        // 2. 만료 여부 확인
-        if (refreshToken.isExpired()) {
-            throw new RefreshTokenExpiredException();
-        }
-
-        // 3. 새 Access Token 발급
-        String newAccessToken = jwtUtil.generateAccessToken(refreshToken.getUser().getId());
-
-        return new TokenResponseDto(newAccessToken);
-    }
-
     // 마이페이지용 유저 단건 조회 (없으면 null)
     public User getUserOrNull(Long userId) {
         return userRepository.findById(userId).orElse(null);
