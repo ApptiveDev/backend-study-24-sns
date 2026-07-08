@@ -24,19 +24,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
-    // 로그인
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto dto) {
-        LoginResponseDto response = userService.login(dto);
-        return ResponseEntity.ok(response);
-    }
-
-    // 토큰 재발급
-    @PostMapping("/refresh")
-    public ResponseEntity<TokenResponseDto> refresh(@RequestBody @Valid RefreshRequestDto dto) {
-        return ResponseEntity.ok(userService.reissueAccessToken(dto));
-    }
-
     // 유저 전체 조회
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
